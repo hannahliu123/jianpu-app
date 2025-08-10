@@ -1,6 +1,8 @@
 {
   "hosting": {
+    "site": "jianpu-app", 
     "public": ".",
+    "cleanUrls": true,
     "ignore": [
       "firebase.json",
       "**/.*",

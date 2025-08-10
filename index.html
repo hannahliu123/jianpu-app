@@ -5,10 +5,66 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="description" content="wip jianpu app">
+        <link href="/css/editor.css" rel="stylesheet">
         <title>Jianpu App</title>
     </head>
     <body>
-        <h1>Jianpu App</h1>
+        <header id="topbar">
+            <div id="logo">🎵 Jianpu Editor</div>
+            <div id="project-title">Untitled Project</div>
+            <div id="topbar-buttons">
+                <button>Save</button>
+                <button>Share</button>
+            </div>
+        </header>
+        <main id="main-layout">
+            <div id="pin-bar">
+                <p>xxx (pin bar)</p>
+            </div>
+            <div id="main-section">
+                <div id="sidebar">
+                    <div class="section">
+                        <!-- some icon -->
+                        <p>Help</p>
+                    </div>
+                    <div class="section">
+                        <!-- some icon -->
+                        <p>Layout</p>
+                    </div>
+                    <div class="section">
+                        <!-- some icon -->
+                        <p>Notes</p>
+                    </div>
+                    <div class="section">
+                        <!-- some icon -->
+                        <p>Articulations</p>
+                    </div>
+                    <div class="section">
+                        <!-- some icon -->
+                        <p>Dynamics</p>
+                    </div>
+                    <div class="section">
+                        <!-- some icon -->
+                        <p>Special Symbols</p>
+                    </div>
+                </div>
+                <div id="edit-panel">
+                    <p>edit</p>
+                    <p>panel</p>
+                    <p>WIP</p>
+                </div>
+                <!-- Sheet Music -->
+                <div class="canvas-container">
+                    <div class="sheet-container">
+                        <svg id="sheet" width="680" height="880" viewBox="0 0 680 880">
+                        <rect x="0" y="0" width="680" height="880" fill="#dddddd"/>
+                        <text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle" font-size="24">Sheet Music Here</text>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <script src="/scripts/editor.js"></script>
         <script type="module" src="/scripts/firebase.js"></script>
     </body>
 </html>
