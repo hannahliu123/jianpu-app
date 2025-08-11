@@ -7,6 +7,8 @@
         <meta name="description" content="wip jianpu app">
         <link href="/css/editor.css" rel="stylesheet">
         <title>Jianpu App</title>
+        <script src="https://cdn.jsdelivr.net/npm/@svgdotjs/svg.js@3.0/dist/svg.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@svgdotjs/svg.draggable.js"></script>
     </head>
     <body>
         <header id="topbar">
@@ -55,16 +57,13 @@
                 </div>
                 <!-- Sheet Music -->
                 <div class="canvas-container">
-                    <div class="sheet-container">
-                        <svg id="sheet" width="680" height="880" viewBox="0 0 680 880">
-                        <rect x="0" y="0" width="680" height="880" fill="#dddddd"/>
-                        <text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle" font-size="24">Sheet Music Here</text>
-                        </svg>
+                    <div id="sheet-container">
                     </div>
                 </div>
             </div>
         </main>
         <script src="/scripts/editor.js"></script>
+        <script src="/scripts/svg.js"></script>
         <script type="module" src="/scripts/firebase.js"></script>
     </body>
 </html>

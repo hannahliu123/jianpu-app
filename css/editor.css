@@ -3,11 +3,12 @@
 }
 
 :root {
-    --bg: #ffffff;
+    --bg: #e0e0e0;
     --text: #212121;
     --top-bar: #2d2d2d;
     --top-bar-text: #ffffff;
     --pin-bg: #fcfcfc;
+    --sidebar-bg: #f9f9f9;
     --sidebar-bg-active: #dbdbdb;
     --sidebar-btn: #ffffff;
     --edit-bg: #f3f3f3;
@@ -84,7 +85,8 @@ button:active {
 #sidebar {
     display: flex;
     flex-direction: column;
-    width: 70px;
+    background-color: var(--sidebar-bg);
+    width: 75px;
     border-right: 1px solid rgba(0, 0, 0, 0.5);
 }
 
@@ -118,15 +120,15 @@ button:active {
     position: relative;         /* later for zooming in/out */
 }
 
-.sheet-container {
+#sheet-container {
     flex: 1;
     display: flex;
     justify-content: center;
     align-items: start;
-    padding: 5vh 0;
     overflow: auto;
+    border: 2px solid blue;
 }
 
 svg {
-    border: 2px solid red;
+    border: 1px solid red;
 }
