@@ -123,12 +123,17 @@ button:active {
 #sheet-container {
     flex: 1;
     display: flex;
-    justify-content: center;
-    align-items: start;
-    overflow: auto;
-    border: 2px solid blue;
+    flex-direction: column;
+    align-items: center;
+    gap: 3vw;
+    padding: 2vw 0;
+    overflow-y: scroll;
 }
 
-svg {
+#sheet-container > svg {
+    flex-shrink: 0;
     border: 1px solid red;
+}
+
+@media print {
 }
