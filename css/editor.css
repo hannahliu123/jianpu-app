@@ -113,7 +113,46 @@ button:active {
     border-right: 1px solid rgba(0, 0, 0, 0.25);
 }
 
-.canvas-container {
+.edit-panel-headers {
+    margin: 0;
+}
+
+.icon {
+    width: min-content;
+}
+
+.icon svg {
+    display: block;
+    cursor: pointer;
+    text-align: center;
+    border: 1px solid black;
+}
+
+#help-icons {
+    border: 2px solid red;
+}
+
+#layout-icons {
+    border: 2px solid orange;
+}
+
+#notes-icons {
+    border: 2px solid yellow;
+}
+
+#articulations-icons {
+    border: 2px solid green;
+}
+
+#dynamics-icons {
+    border: 2px solid cyan;
+}
+
+#special-symbols-icons {
+    border: 2px solid purple;
+}
+
+#sheet-wrapper {
     flex: 1;
     display: flex;
     flex-direction: column;

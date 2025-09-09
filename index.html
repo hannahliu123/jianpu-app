@@ -51,17 +51,67 @@
                     </div>
                 </div>
                 <div id="edit-panel">
-                    <p>edit</p>
-                    <p>panel</p>
-                    <p>WIP</p>
-                    <p>There</p>
-                    <p>will</p>
-                    <p>be</p>
-                    <p>SVGs</p>
-                    <p>here</p>
+                    <div id="help-icons">
+                        <h6 id="help-header" class="edit-panel-headers">Help</h6>
+                    </div>
+                    <div id="layout-icons">
+                        <h6 id="layout-header" class="edit-panel-headers">Layout</h6>
+                        <div class="icon" draggable="true" data-type="bar" title="bar">
+                            <svg width="30" height="30">
+                                <line x1="15" y1="0" x2="15" y2="30" stroke="black" stroke-width="1"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div id="notes-icons">
+                        <h6 id="notes-header" class="edit-panel-headers">Common Notes</h6>
+                        <div class="icon" draggable="true" data-type="note1">
+                            <svg width="30" height="30">
+                                <text x="15" y="15" font-size="20" text-anchor="middle" dominant-baseline="middle">1</text>   <!--  x & y set the BASEline for svg elements. text-anchor and dominant-basline center the text in the middle of the svg -->
+                            </svg>
+                        </div>
+                        <div class="icon" draggable="true" data-type="note2">
+                            <svg width="30" height="30">
+                                <text x="15" y="15" font-size="20" text-anchor="middle" dominant-baseline="middle">2</text>
+                            </svg>
+                        </div>
+                        <div class="icon" draggable="true" data-type="note3">
+                            <svg width="30" height="30">
+                                <text x="15" y="15" font-size="20" text-anchor="middle" dominant-baseline="middle">3</text>
+                            </svg>
+                        </div>
+                        <div class="icon" draggable="true" data-type="note4">
+                            <svg width="30" height="30">
+                                <text x="15" y="15" font-size="20" text-anchor="middle" dominant-baseline="middle">4</text>
+                            </svg>
+                        </div>
+                        <div class="icon" draggable="true" data-type="note5">
+                            <svg width="30" height="30">
+                                <text x="15" y="15" font-size="20" text-anchor="middle" dominant-baseline="middle">5</text>
+                            </svg>
+                        </div>
+                        <div class="icon" draggable="true" data-type="note6">
+                            <svg width="30" height="30">
+                                <text x="15" y="15" font-size="20" text-anchor="middle" dominant-baseline="middle">6</text>
+                            </svg>
+                        </div>
+                        <div class="icon" draggable="true" data-type="note7">
+                            <svg width="30" height="30">
+                                <text x="15" y="15" font-size="20" text-anchor="middle" dominant-baseline="middle">7</text>
+                            </svg>
+                        </div>
+                    </div>
+                    <div id="articulations-icons">
+                        <h6 id="articulations-header" class="edit-panel-headers">Articulations</h6>
+                    </div>
+                    <div id="dynamics-icons">
+                        <h6 id="dynamics-header" class="edit-panel-headers">Dynamics</h6>
+                    </div>
+                    <div id="special-symbols-icons">
+                        <h6 id="special-symbols-header" class="edit-panel-headers">Special Symbols</h6>
+                    </div>
                 </div>
                 <!-- Sheet Music -->
-                <div class="canvas-container">
+                <div id="sheet-wrapper">
                     <div id="sheet-container">
                     </div>
                 </div>
