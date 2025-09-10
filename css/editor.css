@@ -124,8 +124,7 @@ button:active {
 .icon svg {
     display: block;
     cursor: pointer;
-    text-align: center;
-    border: 1px solid black;
+    border: 1px dashed black;
 }
 
 #help-icons {
@@ -171,7 +170,7 @@ button:active {
 
 #sheet-container > svg {
     flex-shrink: 0;
-    border: 1px solid red;
+    border: 1px solid gray;
 }
 
 @media print {

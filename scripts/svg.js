@@ -1,52 +1,86 @@
 const container = document.getElementById("sheet-container");
+const icons = document.querySelectorAll(".icon");
 const width = container.clientWidth - 100;
 const height = 11*width/8.5;    // based on average paper sizes
 
+const iconMap = {   // object matching icon types to creating an SVG on the page
+    bar: (x, y, page) => {
+        const l = page.line(x, y, x, y+30).stroke({ width: 1, color: "black" });
+        l.draggable();
+    },
+    note1: (x, y, page) => {
+        const g = page.group(); // create a group so you can add stuff to it later
+        g.add(page.text("1")).font({ size:"1rem", family: "Arial" }).move(x, y);
+        g.draggable();
+    },
+    note2: (x, y, page) => {
+        const g = page.group();
+        g.add(page.text("2")).font({ size:"1rem", family: "Arial" }).move(x, y);
+        g.draggable();
+    },
+    note3: (x, y, page) => {
+        const g = page.group();
+        g.add(page.text("3")).font({ size:"1rem", family: "Arial" }).move(x, y);
+        g.draggable();
+    },
+    note4: (x, y, page) => {
+        const g = page.group();
+        g.add(page.text("4")).font({ size:"1rem", family: "Arial" }).move(x, y);
+        g.draggable();
+    },
+    note5: (x, y, page) => {
+        const g = page.group();
+        g.add(page.text("5")).font({ size:"1rem", family: "Arial" }).move(x, y);
+        g.draggable();
+    },
+    note6: (x, y, page) => {
+        const g = page.group();
+        g.add(page.text("6")).font({ size:"1rem", family: "Arial" }).move(x, y);
+        g.draggable();
+    },
+    note7: (x, y, page) => {
+        const g = page.group();
+        g.add(page.text("7")).font({ size:"1rem", family: "Arial" }).move(x, y);
+        g.draggable();
+    },
+};
+
 function addPage() {
-    const svg = SVG().addTo(container).size(width, height);
-    svg.rect(width, height).fill("white");
+    const page = SVG().addTo(container).size(width, height);
+    page.rect(width, height).fill("white");
 
     // allow dropping HTML SVG elements on this page
-    const pageNode = svg.node;
+    const pageNode = page.node;
     pageNode.addEventListener("dragover", e => e.preventDefault()); // cancel default behavior so that the browser will let you drop elements onto the page
     pageNode.addEventListener("drop", e => {
         e.preventDefault();
-        alert(e.target);
         
-        // retrieves data-type so we can figure out what SVG element to add to the page
-        const type = e.dataTransfer.getData("type"); // uhhh wip i need to set this with setData but ill do that another time i need sleep heh
+        // retrieves data-type from HTML so we can figure out what SVG element to add to the page
+        const type = e.dataTransfer.getData("type");
 
+        // Convert mouse coordinates (e.clientX & e.clientY) to SVG coordinates
+        const pt = pageNode.createSVGPoint();   // create SVG point
+        pt.x = e.clientX;   // set coordinates for the point
+        pt.y = e.clientY
+        const svgCoords = pt.matrixTransform(pageNode.getScreenCTM().inverse()); // get SVG coords
+
+        if (iconMap[type]) {    // if it exists (later add if it's over a drop-zone)
+            iconMap[type](svgCoords.x, svgCoords.y, page);  // create the corresponding SVG
+        }
     });
 
-    return svg;
+    return page;
 }
 
-const page = addPage();
-// const page2 = addPage();
+const page1 = addPage();
+const page2 = addPage();
 
-var text = page.text("hello")
-    .font({
-        size: "1.25rem",    // font-size (number means pixels, use quotes if using units)
-        anchor: "middle",   // text alignment
-        family: "Arial"
-    })
-    .move(100, 60)      // x, y
-    .draggable().on("dragmove.namespace", (event) => {
-        const { handler, box } = event.detail;
-        event.preventDefault();
-        handler.move(box.x - (box.x % 10), box.y - (box.y % 100));
+icons.forEach(icon => {
+    icon.addEventListener("dragstart", e => {
+        // set value to data-type="" in HTML
+        e.dataTransfer.setData("type", icon.dataset.type);
     });
+});
 
-const baseNote1 = page.group();
-baseNote1.add(page.text("1")).font({ size:"1.25rem" });
-baseNote1.add(page.circle(5).fill("black").move(4, 0));
-
-const baseNote2 = page.group();
-baseNote2.add(page.text("2")).font({ size:"1.25rem" }).move(0, 100);
-baseNote2.add(page.circle(5).fill("black").move(4, 100));
-
-var note1 = baseNote1.clone().draggable().addTo(page);
-var note2 = baseNote1.clone().draggable().addTo(page);
-
-var svgData = page.svg();   // XML
+var svgData = page1.svg();   // XML
 console.log(svgData);
