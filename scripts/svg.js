@@ -73,13 +73,26 @@ function addPage() {
 }
 
 const page1 = addPage();
-const page2 = addPage();
 
 icons.forEach(icon => {
     icon.addEventListener("dragstart", e => {
         // set value to data-type="" in HTML
         e.dataTransfer.setData("type", icon.dataset.type);
     });
+});
+
+// Adding/Removing Pages (WIP removing)
+document.getElementById("add-page-btn").addEventListener("click", () => {
+    addPage();
+});
+
+// Adding Layout Details (title, composer, etc.)
+const titleText = page1.text("Untitled")
+    .font({ size: 0.05*width, family: "Arial" })
+    .center(width/2, 0.1*height);
+
+document.getElementById("title-input").addEventListener("input", e => {
+    titleText.text(e.target.value).center(width/2, 0.1*height);
 });
 
 var svgData = page1.svg();   // XML

@@ -9,6 +9,9 @@
         <title>Jianpu App</title>
         <script src="https://cdn.jsdelivr.net/npm/@svgdotjs/svg.js@3.0/dist/svg.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/@svgdotjs/svg.draggable.js"></script>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
     </head>
     <body>
         <header id="topbar">
@@ -52,18 +55,42 @@
                 </div>
                 <div id="edit-panel">
                     <div id="help-icons">
-                        <h6 id="help-header" class="edit-panel-headers">Help</h6>
+                        <h4 id="help-header" class="edit-panel-headers">Help</h4>
+                        <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Molestiae iste cumque quos ducimus hic incidunt fugit cum dolore dicta, neque sequi, voluptatum quaerat iusto esse. Similique doloribus dolorem saepe nemo!</p>
                     </div>
                     <div id="layout-icons">
-                        <h6 id="layout-header" class="edit-panel-headers">Layout</h6>
+                        <h4 id="layout-header" class="edit-panel-headers">Layout</h4>
+                        <div class="input-container">
+                            <label for="title-input">Title:</label>
+                            <input type="text" id="title-input" value="Untitled">
+                        </div>
+                        <div class="input-container">
+                            <label for="subtitle-input">Subtitle:</label>
+                            <input type="text" id="subtitle-input" value="None">
+                            <input type="checkbox" name="subtitle-checkbox" value="subtitle">
+                        </div>
+                        <div class="input-container">
+                            <label for="composer-input">Composer:</label>
+                            <input type="text" id="composer-input" value="None">
+                            <input type="checkbox" name="composer-checkbox" value="composer">
+                        </div>
+                        <div class="input-container">
+                            <label for="arranger-input">Arranger:</label>
+                            <input type="text" id="arranger-input" value="None">
+                            <input type="checkbox" name="arranger-checkbox" value="arranger">
+                        </div>
+                        <div class="input-container">
+                            <button id="add-page-btn">Add Page</button>
+                            <button id="remove-page-btn">Remove Page</button>
+                        </div>
+                    </div>
+                    <div id="notes-icons">
+                        <h4 id="notes-header" class="edit-panel-headers">Notes/Symbols</h4>
                         <div class="icon" draggable="true" data-type="bar" title="bar">
                             <svg width="20" height="30">
                                 <line x1="10" y1="0" x2="10" y2="30" stroke="black" stroke-width="1"/>
                             </svg>
                         </div>
-                    </div>
-                    <div id="notes-icons">
-                        <h6 id="notes-header" class="edit-panel-headers">Common Notes</h6>
                         <div class="icon" draggable="true" data-type="note1">
                             <svg width="20" height="20">
                                 <text x="10" y="10" font-size="1rem" text-anchor="middle" dominant-baseline="middle">1</text>   <!--  x & y set the BASEline for svg elements. text-anchor and dominant-basline center the text in the middle of the svg -->
@@ -101,13 +128,13 @@
                         </div>
                     </div>
                     <div id="articulations-icons">
-                        <h6 id="articulations-header" class="edit-panel-headers">Articulations</h6>
+                        <h4 id="articulations-header" class="edit-panel-headers">Articulations</h4>
                     </div>
                     <div id="dynamics-icons">
-                        <h6 id="dynamics-header" class="edit-panel-headers">Dynamics</h6>
+                        <h4 id="dynamics-header" class="edit-panel-headers">Dynamics</h4>
                     </div>
                     <div id="special-symbols-icons">
-                        <h6 id="special-symbols-header" class="edit-panel-headers">Special Symbols</h6>
+                        <h4 id="special-symbols-header" class="edit-panel-headers">Special Symbols</h4>
                     </div>
                 </div>
                 <!-- Sheet Music -->
