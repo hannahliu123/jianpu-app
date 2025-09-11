@@ -83,13 +83,15 @@ icons.forEach(icon => {
     });
 });
 
-// Project Title changes on "enter"
-const projectTitle = document.getElementById("project-title");
-projectTitle.addEventListener("keydown", e => {
-    if (e.key === "Enter") {
-        e.preventDefault;
-        projectTitle.blur();    // blur means "losing focus" so you just exit out of the input box
-    }
+// Input areas change on "enter" b/c it's more logical :)
+const blurs = document.querySelectorAll(".blur");
+blurs.forEach(input => {
+    input.addEventListener("keydown", e => {
+        if (e.key === "Enter") {
+            e.preventDefault;
+            input.blur();    // blur means "losing focus" so you just exit out of the input box
+        }
+    });
 });
 
 // Adding/Removing Pages (WIP removing)
