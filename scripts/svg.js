@@ -2,45 +2,47 @@ const container = document.getElementById("sheet-container");
 const icons = document.querySelectorAll(".icon");
 const width = container.clientWidth - 100;
 const height = 11*width/8.5;    // based on average paper sizes
+var noteSize = 0.03*width;
+var barSize = 0.05*width;
 
 const iconMap = {   // object matching icon types to creating an SVG on the page
     bar: (x, y, page) => {
-        const l = page.line(x, y, x, y+30).stroke({ width: 1, color: "black" });
+        const l = page.line(x, y, x, y+barSize).stroke({ width: 1, color: "black" });
         l.draggable();
     },
     note1: (x, y, page) => {
         const g = page.group(); // create a group so you can add stuff to it later
-        g.add(page.text("1")).font({ size:"1rem", family: "Arial" }).move(x, y);
+        g.add(page.text("1")).font({ size:noteSize, family: "Arial" }).move(x, y);
         g.draggable();
     },
     note2: (x, y, page) => {
         const g = page.group();
-        g.add(page.text("2")).font({ size:"1rem", family: "Arial" }).move(x, y);
+        g.add(page.text("2")).font({ size:noteSize, family: "Arial" }).move(x, y);
         g.draggable();
     },
     note3: (x, y, page) => {
         const g = page.group();
-        g.add(page.text("3")).font({ size:"1rem", family: "Arial" }).move(x, y);
+        g.add(page.text("3")).font({ size:noteSize, family: "Arial" }).move(x, y);
         g.draggable();
     },
     note4: (x, y, page) => {
         const g = page.group();
-        g.add(page.text("4")).font({ size:"1rem", family: "Arial" }).move(x, y);
+        g.add(page.text("4")).font({ size:noteSize, family: "Arial" }).move(x, y);
         g.draggable();
     },
     note5: (x, y, page) => {
         const g = page.group();
-        g.add(page.text("5")).font({ size:"1rem", family: "Arial" }).move(x, y);
+        g.add(page.text("5")).font({ size:noteSize, family: "Arial" }).move(x, y);
         g.draggable();
     },
     note6: (x, y, page) => {
         const g = page.group();
-        g.add(page.text("6")).font({ size:"1rem", family: "Arial" }).move(x, y);
+        g.add(page.text("6")).font({ size:noteSize, family: "Arial" }).move(x, y);
         g.draggable();
     },
     note7: (x, y, page) => {
         const g = page.group();
-        g.add(page.text("7")).font({ size:"1rem", family: "Arial" }).move(x, y);
+        g.add(page.text("7")).font({ size:noteSize, family: "Arial" }).move(x, y);
         g.draggable();
     },
 };
@@ -81,6 +83,15 @@ icons.forEach(icon => {
     });
 });
 
+// Project Title changes on "enter"
+const projectTitle = document.getElementById("project-title");
+projectTitle.addEventListener("keydown", e => {
+    if (e.key === "Enter") {
+        e.preventDefault;
+        projectTitle.blur();    // blur means "losing focus" so you just exit out of the input box
+    }
+});
+
 // Adding/Removing Pages (WIP removing)
 document.getElementById("add-page-btn").addEventListener("click", () => {
     addPage();
@@ -93,6 +104,16 @@ const titleText = page1.text("Untitled")
 
 document.getElementById("title-input").addEventListener("input", e => {
     titleText.text(e.target.value).center(width/2, 0.1*height);
+});
+
+// Saving
+document.getElementById("save-btn").addEventListener("click", () => {
+    alert("Saving functionality currently in progress")
+});
+
+// Sharing
+document.getElementById("share-btn").addEventListener("click", () => {
+    alert("Sharing functionality currently in progress")
 });
 
 var svgData = page1.svg();   // XML
