@@ -4,6 +4,7 @@ const width = container.clientWidth - 100;
 const height = 11*width/8.5;    // based on average paper sizes
 var noteSize = 0.03*width;
 var barSize = 0.05*width;
+const allPages = [];
 
 const iconMap = {   // object matching icon types to creating an SVG on the page
     bar: (x, y, page) => {
@@ -47,9 +48,21 @@ const iconMap = {   // object matching icon types to creating an SVG on the page
     },
 };
 
+function updatePageNumbers() {
+    allPages.forEach((p, i) => {    // p is the page itself (SVG), i is index
+        // Update the value (text) for each page's page number
+        p.pageNumber.text((i+1).toString());    // bc i is 0-indexed
+    });
+}
+
 function addPage() {
     const page = SVG().addTo(container).size(width, height);
     page.rect(width, height).fill("white");
+
+    // Add page number (placeholder element)
+    const pageNum = page.text("").font({ size:noteSize, family: "Arial" })
+        .move(0.5*width, 0.92*height);
+    page.pageNumber = pageNum;  // assign it to a variable so it can be edited easily
 
     // allow dropping HTML SVG elements on this page
     const pageNode = page.node;
@@ -71,10 +84,23 @@ function addPage() {
         }
     });
 
+    allPages.push(page);
+    updatePageNumbers();
     return page;
 }
 
-const page1 = addPage();
+function removePage() { // only able to remove the last page (for now)
+    if (allPages.length > 1) {
+        // Confirm page delete
+        if (!confirm("Are you sure you want to delete page " + allPages.length + "?")) return;
+
+        const p = allPages.pop();   // returns the popped page too
+        p.remove();
+        updatePageNumbers();    // technically don't need this rn but imma keep it for later
+    } else alert("You cannot delete the last page.")
+}
+
+addPage();
 
 icons.forEach(icon => {
     icon.addEventListener("dragstart", e => {
@@ -94,13 +120,12 @@ blurs.forEach(input => {
     });
 });
 
-// Adding/Removing Pages (WIP removing)
-document.getElementById("add-page-btn").addEventListener("click", () => {
-    addPage();
-});
+// Adding/Removing Pages
+document.getElementById("add-page-btn").addEventListener("click", addPage);
+document.getElementById("remove-page-btn").addEventListener("click", removePage);
 
 // Adding Layout Details (title, composer, etc.)
-const titleText = page1.text("Untitled")
+const titleText = allPages[0].text("Untitled")
     .font({ size: 0.05*width, family: "Arial" })
     .center(width/2, 0.1*height);
 
@@ -118,5 +143,5 @@ document.getElementById("share-btn").addEventListener("click", () => {
     alert("Sharing functionality currently in progress")
 });
 
-var svgData = page1.svg();   // XML
+var svgData = allPages[0].svg();   // XML
 console.log(svgData);
