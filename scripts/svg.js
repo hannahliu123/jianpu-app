@@ -1,15 +1,18 @@
 const container = document.getElementById("sheet-container");
 const icons = document.querySelectorAll(".icon");
-const width = container.clientWidth - 100;
+const width = container.clientWidth - 50;
 const height = 11*width/8.5;    // based on average paper sizes
 var noteSize = 0.03*width;
-var barSize = 0.05*width;
+var barHeight = 0.05*width;
+var barWidth = 0.35*barHeight;
 const allPages = [];
 
 const iconMap = {   // object matching icon types to creating an SVG on the page
     bar: (x, y, page) => {
-        const l = page.line(x, y, x, y+barSize).stroke({ width: 1, color: "black" });
-        l.draggable();
+        const g = page.group();
+        g.add(page.rect(barWidth, barHeight).fill("transparent").center(x, y+(0.5*barHeight)));
+        g.add(page.line(x, y, x, y+barHeight).stroke({ width: 1, color: "black" }));
+        g.draggable();
     },
     note1: (x, y, page) => {
         const g = page.group(); // create a group so you can add stuff to it later
