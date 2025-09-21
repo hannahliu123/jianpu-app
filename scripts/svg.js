@@ -109,17 +109,6 @@ icons.forEach(icon => {
     });
 });
 
-// Input areas change on "enter" b/c it's more logical :)
-const blurs = document.querySelectorAll(".blur");
-blurs.forEach(input => {
-    input.addEventListener("keydown", e => {
-        if (e.key === "Enter") {
-            e.preventDefault;
-            input.blur();    // blur means "losing focus" so you just exit out of the input box
-        }
-    });
-});
-
 // Adding/Removing Pages
 document.getElementById("add-page-btn").addEventListener("click", addPage);
 document.getElementById("remove-page-btn").addEventListener("click", removePage);

@@ -142,12 +142,12 @@ button:active {
 #edit-panel {
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 15px;
     background-color: var(--edit-bg);
     max-width: 20vw;
     min-width: 250px;
     overflow-y: scroll;
-    padding: 0px 15px;
+    padding: 10px 15px 20px 15px;
     border-right: 1px solid rgba(0, 0, 0, 0.25);
 }
 
@@ -171,14 +171,6 @@ button:active {
     border: 1px dashed black;
 }
 
-#help-icons {
-    border: 2px solid red;
-}
-
-#layout-icons {
-    border: 2px solid orange;
-}
-
 .input-container {
     display: flex;
     align-items: center;
@@ -188,22 +180,6 @@ button:active {
 #add-page-btn, #remove-page-btn {
     border: 1px solid black;
     width: 50%;
-}
-
-#notes-icons {
-    border: 2px solid yellow;
-}
-
-#articulations-icons {
-    border: 2px solid green;
-}
-
-#dynamics-icons {
-    border: 2px solid cyan;
-}
-
-#special-symbols-icons {
-    border: 2px solid purple;
 }
 
 #sheet-wrapper {
