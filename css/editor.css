@@ -161,6 +161,11 @@ button:active {
     margin: 0;
 }
 
+#notes-container {
+    display: flex;
+    gap: 5px;
+}
+
 .icon {
     width: min-content;
 }
@@ -180,6 +185,11 @@ button:active {
 #add-page-btn, #remove-page-btn {
     border: 1px solid black;
     width: 50%;
+}
+
+#add-measure-btn {
+    border: 1px solid black;
+    width: 170px;   /* idk depends on future layouts */
 }
 
 #sheet-wrapper {

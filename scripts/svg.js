@@ -1,19 +1,21 @@
+// VARIABLES --------------------------------------------------------------------
 const container = document.getElementById("sheet-container");
-const icons = document.querySelectorAll(".icon");
 const width = container.clientWidth - 50;
 const height = 11*width/8.5;    // based on average paper sizes
 var noteSize = 0.03*width;
-var barHeight = 0.05*width;
-var barWidth = 0.35*barHeight;
-const allPages = [];
+var allPages = [];
+// Measures Variables
+var allMeasures = [];
+const measureHeight = 0.05*width;   // permanent
+const measureWidth = 0.05*width;    // default before anything is added
+var barWidth = 0.02*measureHeight;
+const defaultMeasureX = 0.1*width;  // x position
+const defaultMeasureY = 0.1*height; // y position
+let pageOneOffset = 0.075*height;   // offset due to title & other text on the first page
+let rowSpace = 0.025*height;        // space in between rows
 
+// FUNCTIONS --------------------------------------------------------------------
 const iconMap = {   // object matching icon types to creating an SVG on the page
-    bar: (x, y, page) => {
-        const g = page.group();
-        g.add(page.rect(barWidth, barHeight).fill("transparent").center(x, y+(0.5*barHeight)));
-        g.add(page.line(x, y, x, y+barHeight).stroke({ width: 1, color: "black" }));
-        g.draggable();
-    },
     note1: (x, y, page) => {
         const g = page.group(); // create a group so you can add stuff to it later
         g.add(page.text("1")).font({ size:noteSize, family: "Arial" }).move(x, y);
@@ -67,26 +69,6 @@ function addPage() {
         .move(0.5*width, 0.92*height);
     page.pageNumber = pageNum;  // assign it to a variable so it can be edited easily
 
-    // allow dropping HTML SVG elements on this page
-    const pageNode = page.node;
-    pageNode.addEventListener("dragover", e => e.preventDefault()); // cancel default behavior so that the browser will let you drop elements onto the page
-    pageNode.addEventListener("drop", e => {
-        e.preventDefault();
-        
-        // retrieves data-type from HTML so we can figure out what SVG element to add to the page
-        const type = e.dataTransfer.getData("type");
-
-        // Convert mouse coordinates (e.clientX & e.clientY) to SVG coordinates
-        const pt = pageNode.createSVGPoint();   // create SVG point
-        pt.x = e.clientX;   // set coordinates for the point
-        pt.y = e.clientY
-        const svgCoords = pt.matrixTransform(pageNode.getScreenCTM().inverse()); // get SVG coords
-
-        if (iconMap[type]) {    // if it exists (later add if it's over a drop-zone)
-            iconMap[type](svgCoords.x, svgCoords.y, page);  // create the corresponding SVG
-        }
-    });
-
     allPages.push(page);
     updatePageNumbers();
     return page;
@@ -103,9 +85,79 @@ function removePage() { // only able to remove the last page (for now)
     } else alert("You cannot delete the last page.")
 }
 
+// Track where to add the next measure
+let currPageIndex = 0;
+let currMeasureX = defaultMeasureX;
+let currMeasureY = defaultMeasureY;
+function addMeasure() {
+    var page = allPages[currPageIndex];
+    if (allMeasures.length === 0) currMeasureY += pageOneOffset;
+
+    // If the measure needs to go onto the next row
+    if (currMeasureX + measureWidth > 0.9*width) {
+        currMeasureX = defaultMeasureX;
+        currMeasureY += measureHeight + rowSpace;
+
+        // If the measure needs to go onto the next page
+        if (currMeasureY + measureHeight > 0.9*height) {
+            currPageIndex++;
+
+            // Check if we need a new page added or not
+            if (allPages.length < currPageIndex+1) addPage();
+
+            page = allPages[currPageIndex];
+            currMeasureY = defaultMeasureY;
+        }
+    }
+
+    const measureGroup = page.group();
+    const dropZone = measureGroup.rect(measureWidth, measureHeight)
+        .fill("transparent")
+        .fill("#f2f2f2")
+        .move(currMeasureX, currMeasureY);
+    measureGroup.line(currMeasureX+measureWidth, currMeasureY, currMeasureX+measureWidth, currMeasureY+measureHeight)
+        .stroke({ width: barWidth, color: "black" });
+        
+    // When an item is dropped onto a measure (allow dropping)
+    const dropNode = dropZone.node;
+    const pageNode = page.node;
+    dropNode.addEventListener("dragover", e => {
+        e.preventDefault();     // cancel default behavior so that the browser will let you drop elements onto the page
+
+        const pt = pageNode.createSVGPoint();
+        pt.x = e.clientX;
+        pt.y = e.clientY
+        const svgCoords = pt.matrixTransform(measureGroup.node.getScreenCTM().inverse());
+
+        var previewBox = measureGroup.rect(w, h).fill("cyan");
+    }); 
+    dropNode.addEventListener("drop", e => {
+        e.preventDefault();
+        
+        // retrieves data-type from HTML so we can figure out what SVG element to add to the page
+        const type = e.dataTransfer.getData("type");
+
+        // Convert mouse coordinates (e.clientX & e.clientY) to SVG coordinates
+        const pt = pageNode.createSVGPoint();   // create SVG point
+        pt.x = e.clientX;   // set dropped mouse coordinates for the point
+        pt.y = e.clientY
+        const svgCoords = pt.matrixTransform(measureGroup.node.getScreenCTM().inverse()); // get SVG coords based off the coords of the measure group
+
+        if (iconMap[type]) {    // if it exists (later add if it's over a drop-zone)
+            iconMap[type](svgCoords.x, svgCoords.y, page);  // create the corresponding SVG
+        }
+    });
+
+    measureGroup.currWidth = measureWidth;  // create a variable tracking the width of the measure
+    currMeasureX += measureWidth;   // edit variable for next measure
+
+    allMeasures.push({ measureGroup, currMeasureX, currMeasureY });  // add data
+}
+
 addPage();
 
-icons.forEach(icon => {
+// EVENT LISTENERS --------------------------------------------------------------
+document.querySelectorAll(".icon").forEach(icon => {
     icon.addEventListener("dragstart", e => {
         // set value to data-type="" in HTML
         e.dataTransfer.setData("type", icon.dataset.type);
@@ -115,6 +167,11 @@ icons.forEach(icon => {
 // Adding/Removing Pages
 document.getElementById("add-page-btn").addEventListener("click", addPage);
 document.getElementById("remove-page-btn").addEventListener("click", removePage);
+
+// Adding Measures
+document.getElementById("add-measure-btn").addEventListener("click", () => {
+    addMeasure();
+});
 
 // Adding Layout Details (title, composer, etc.)
 const titleText = allPages[0].text("Untitled")

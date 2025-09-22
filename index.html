@@ -86,46 +86,44 @@
                     </div>
                     <div id="notes-icons">
                         <h4 id="notes-header" class="edit-panel-headers">Notes/Symbols</h4>
-                        <div class="icon" draggable="true" data-type="bar" title="bar">
-                            <svg width="20" height="30">
-                                <line x1="10" y1="0" x2="10" y2="30" stroke="black" stroke-width="1"/>
-                            </svg>
+                        <div id="notes-container">
+                            <div class="icon" draggable="true" data-type="note1">
+                                <svg width="20" height="20">
+                                    <text font-family="Arial" x="10" y="10" font-size="1rem" text-anchor="middle" dominant-baseline="middle">1</text>   <!--  x & y set the BASEline for svg elements. text-anchor and dominant-basline center the text in the middle of the svg -->
+                                </svg>
+                            </div>
+                            <div class="icon" draggable="true" data-type="note2">
+                                <svg width="20" height="20">
+                                    <text font-family="Arial" x="10" y="10" font-size="1rem" text-anchor="middle" dominant-baseline="middle">2</text>
+                                </svg>
+                            </div>
+                            <div class="icon" draggable="true" data-type="note3">
+                                <svg width="20" height="20">
+                                    <text font-family="Arial" x="10" y="10" font-size="1rem" text-anchor="middle" dominant-baseline="middle">3</text>
+                                </svg>
+                            </div>
+                            <div class="icon" draggable="true" data-type="note4">
+                                <svg width="20" height="20">
+                                    <text font-family="Arial" x="10" y="10" font-size="1rem" text-anchor="middle" dominant-baseline="middle">4</text>
+                                </svg>
+                            </div>
+                            <div class="icon" draggable="true" data-type="note5">
+                                <svg width="20" height="20">
+                                    <text font-family="Arial" x="10" y="10" font-size="1rem" text-anchor="middle" dominant-baseline="middle">5</text>
+                                </svg>
+                            </div>
+                            <div class="icon" draggable="true" data-type="note6">
+                                <svg width="20" height="20">
+                                    <text font-family="Arial" x="10" y="10" font-size="1rem" text-anchor="middle" dominant-baseline="middle">6</text>
+                                </svg>
+                            </div>
+                            <div class="icon" draggable="true" data-type="note7">
+                                <svg width="20" height="20">
+                                    <text font-family="Arial" x="10" y="10" font-size="1rem" text-anchor="middle" dominant-baseline="middle">7</text>
+                                </svg>
+                            </div>
                         </div>
-                        <div class="icon" draggable="true" data-type="note1">
-                            <svg width="20" height="20">
-                                <text x="10" y="10" font-size="1rem" text-anchor="middle" dominant-baseline="middle">1</text>   <!--  x & y set the BASEline for svg elements. text-anchor and dominant-basline center the text in the middle of the svg -->
-                            </svg>
-                        </div>
-                        <div class="icon" draggable="true" data-type="note2">
-                            <svg width="20" height="20">
-                                <text x="10" y="10" font-size="1rem" text-anchor="middle" dominant-baseline="middle">2</text>
-                            </svg>
-                        </div>
-                        <div class="icon" draggable="true" data-type="note3">
-                            <svg width="20" height="20">
-                                <text x="10" y="10" font-size="1rem" text-anchor="middle" dominant-baseline="middle">3</text>
-                            </svg>
-                        </div>
-                        <div class="icon" draggable="true" data-type="note4">
-                            <svg width="20" height="20">
-                                <text x="10" y="10" font-size="1rem" text-anchor="middle" dominant-baseline="middle">4</text>
-                            </svg>
-                        </div>
-                        <div class="icon" draggable="true" data-type="note5">
-                            <svg width="20" height="20">
-                                <text x="10" y="10" font-size="1rem" text-anchor="middle" dominant-baseline="middle">5</text>
-                            </svg>
-                        </div>
-                        <div class="icon" draggable="true" data-type="note6">
-                            <svg width="20" height="20">
-                                <text x="10" y="10" font-size="1rem" text-anchor="middle" dominant-baseline="middle">6</text>
-                            </svg>
-                        </div>
-                        <div class="icon" draggable="true" data-type="note7">
-                            <svg width="20" height="20">
-                                <text x="10" y="10" font-size="1rem" text-anchor="middle" dominant-baseline="middle">7</text>
-                            </svg>
-                        </div>
+                        <button id="add-measure-btn">Add Measure</button>
                     </div>
                     <div id="articulations-icons">
                         <h4 id="articulations-header" class="edit-panel-headers">Articulations</h4>
