@@ -14,42 +14,37 @@ const defaultMeasureY = 0.1*height; // y position
 let pageOneOffset = 0.075*height;   // offset due to title & other text on the first page
 let rowSpace = 0.025*height;        // space in between rows
 
+let selectedTool = null;
+
 // FUNCTIONS --------------------------------------------------------------------
 const iconMap = {   // object matching icon types to creating an SVG on the page
     note1: (x, y, page) => {
         const g = page.group(); // create a group so you can add stuff to it later
         g.add(page.text("1")).font({ size:noteSize, family: "Arial" }).move(x, y);
-        g.draggable();
     },
     note2: (x, y, page) => {
         const g = page.group();
         g.add(page.text("2")).font({ size:noteSize, family: "Arial" }).move(x, y);
-        g.draggable();
     },
     note3: (x, y, page) => {
         const g = page.group();
         g.add(page.text("3")).font({ size:noteSize, family: "Arial" }).move(x, y);
-        g.draggable();
     },
     note4: (x, y, page) => {
         const g = page.group();
         g.add(page.text("4")).font({ size:noteSize, family: "Arial" }).move(x, y);
-        g.draggable();
     },
     note5: (x, y, page) => {
         const g = page.group();
         g.add(page.text("5")).font({ size:noteSize, family: "Arial" }).move(x, y);
-        g.draggable();
     },
     note6: (x, y, page) => {
         const g = page.group();
         g.add(page.text("6")).font({ size:noteSize, family: "Arial" }).move(x, y);
-        g.draggable();
     },
     note7: (x, y, page) => {
         const g = page.group();
         g.add(page.text("7")).font({ size:noteSize, family: "Arial" }).move(x, y);
-        g.draggable();
     },
 };
 
@@ -111,56 +106,41 @@ function addMeasure() {
     }
 
     const measureGroup = page.group();
-    const dropZone = measureGroup.rect(measureWidth, measureHeight)
+    const dropZone = measureGroup.rect(0.6*measureWidth, measureHeight)
         .fill("transparent")
-        .fill("#f2f2f2")
-        .move(currMeasureX, currMeasureY);
+        .move(currMeasureX+0.2*measureWidth, currMeasureY);
     measureGroup.line(currMeasureX+measureWidth, currMeasureY, currMeasureX+measureWidth, currMeasureY+measureHeight)
         .stroke({ width: barWidth, color: "black" });
-        
-    // When an item is dropped onto a measure (allow dropping)
-    const dropNode = dropZone.node;
-    const pageNode = page.node;
-    dropNode.addEventListener("dragover", e => {
-        e.preventDefault();     // cancel default behavior so that the browser will let you drop elements onto the page
-
-        const pt = pageNode.createSVGPoint();
-        pt.x = e.clientX;
-        pt.y = e.clientY
-        const svgCoords = pt.matrixTransform(measureGroup.node.getScreenCTM().inverse());
-
-        var previewBox = measureGroup.rect(w, h).fill("cyan");
-    }); 
-    dropNode.addEventListener("drop", e => {
-        e.preventDefault();
-        
-        // retrieves data-type from HTML so we can figure out what SVG element to add to the page
-        const type = e.dataTransfer.getData("type");
-
-        // Convert mouse coordinates (e.clientX & e.clientY) to SVG coordinates
-        const pt = pageNode.createSVGPoint();   // create SVG point
-        pt.x = e.clientX;   // set dropped mouse coordinates for the point
-        pt.y = e.clientY
-        const svgCoords = pt.matrixTransform(measureGroup.node.getScreenCTM().inverse()); // get SVG coords based off the coords of the measure group
-
-        if (iconMap[type]) {    // if it exists (later add if it's over a drop-zone)
-            iconMap[type](svgCoords.x, svgCoords.y, page);  // create the corresponding SVG
+    
+    dropZone.mouseover(() => {
+        if (selectedTool) dropZone.fill("#cceeff")
+    });
+    dropZone.mouseout(() => dropZone.fill("transparent"));
+    dropZone.click(() => {
+        if (selectedTool && iconMap[selectedTool]) {
+            // WIP: calculate x & y values (placeholders for now)
+            const x = 100;
+            const y = 100;
+            iconMap[selectedTool](x, y, measureGroup);
         }
     });
-
-    measureGroup.currWidth = measureWidth;  // create a variable tracking the width of the measure
-    currMeasureX += measureWidth;   // edit variable for next measure
-
-    allMeasures.push({ measureGroup, currMeasureX, currMeasureY });  // add data
 }
 
 addPage();
 
 // EVENT LISTENERS --------------------------------------------------------------
+let prevSelected = null;
 document.querySelectorAll(".icon").forEach(icon => {
-    icon.addEventListener("dragstart", e => {
-        // set value to data-type="" in HTML
-        e.dataTransfer.setData("type", icon.dataset.type);
+    icon.addEventListener("click", () => {
+        if (prevSelected) prevSelected.classList.remove("selected");
+        icon.classList.toggle("selected");
+        if (selectedTool === icon.dataset.type) {
+            selectedTool = null;
+            document.body.style.cursor = "auto";
+        } else {
+            selectedTool = icon.dataset.type
+            document.body.style.cursor = "pointer";
+        } prevSelected = icon;
     });
 });
 
@@ -189,7 +169,18 @@ document.getElementById("save-btn").addEventListener("click", () => {
 
 // Sharing
 document.getElementById("share-btn").addEventListener("click", () => {
-    alert("Sharing functionality currently in progress")
+    document.getElementById("share-popup").classList.add("active");
+});
+document.getElementById("exit-share").addEventListener("click", () => {
+    document.getElementById("share-popup").classList.remove("active");
+});
+
+document.getElementById("download-btn").addEventListener("click", () => {
+    alert("Download functionality currently in progress")
+});
+
+document.getElementById("print-btn").addEventListener("click", () => {
+    alert("Printing functionality currently in progress")
 });
 
 var svgData = allPages[0].svg();   // XML

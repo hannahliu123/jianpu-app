@@ -16,6 +16,9 @@
     --btn: #ffffff;
     --btn-hover: #e9e9e9;
     --btn-active: #d3d3d3;
+    --icon-selected: #c9e3f9;
+    --icon-hover: #e3edf7;
+    --share-popup: #c1c1c1;
 }
 
 html {
@@ -170,6 +173,14 @@ button:active {
     width: min-content;
 }
 
+.icon:hover {
+    background-color: var(--icon-hover);
+}
+
+.icon.selected {
+    background-color: var(--icon-selected);
+}
+
 .icon svg {
     display: block;
     cursor: pointer;
@@ -212,6 +223,24 @@ button:active {
 #sheet-container > svg {
     flex-shrink: 0;
     border: 1px solid gray;
+}
+
+#sheet-container g {
+    flex-shrink: 0;
+    border: 1px solid red;
+}
+
+#share-popup {
+    display: none;
+    padding: 10px;
+    background-color: var(--share-popup);
+}
+
+#share-popup.active {
+    display: block;
+    position: fixed;
+    top: 45px;
+    right: 5px;
 }
 
 @media print {

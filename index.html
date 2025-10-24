@@ -8,7 +8,7 @@
         <link href="/css/editor.css" rel="stylesheet">
         <title>Jianpu App</title>
         <script src="https://cdn.jsdelivr.net/npm/@svgdotjs/svg.js@3.0/dist/svg.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/@svgdotjs/svg.draggable.js"></script>
+        <!-- <script src="https://cdn.jsdelivr.net/npm/@svgdotjs/svg.draggable.js"></script> -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
@@ -87,37 +87,37 @@
                     <div id="notes-icons">
                         <h4 id="notes-header" class="edit-panel-headers">Notes/Symbols</h4>
                         <div id="notes-container">
-                            <div class="icon" draggable="true" data-type="note1">
+                            <div class="icon" data-type="note1">
                                 <svg width="20" height="20">
                                     <text font-family="Arial" x="10" y="10" font-size="1rem" text-anchor="middle" dominant-baseline="middle">1</text>   <!--  x & y set the BASEline for svg elements. text-anchor and dominant-basline center the text in the middle of the svg -->
                                 </svg>
                             </div>
-                            <div class="icon" draggable="true" data-type="note2">
+                            <div class="icon" data-type="note2">
                                 <svg width="20" height="20">
                                     <text font-family="Arial" x="10" y="10" font-size="1rem" text-anchor="middle" dominant-baseline="middle">2</text>
                                 </svg>
                             </div>
-                            <div class="icon" draggable="true" data-type="note3">
+                            <div class="icon" data-type="note3">
                                 <svg width="20" height="20">
                                     <text font-family="Arial" x="10" y="10" font-size="1rem" text-anchor="middle" dominant-baseline="middle">3</text>
                                 </svg>
                             </div>
-                            <div class="icon" draggable="true" data-type="note4">
+                            <div class="icon" data-type="note4">
                                 <svg width="20" height="20">
                                     <text font-family="Arial" x="10" y="10" font-size="1rem" text-anchor="middle" dominant-baseline="middle">4</text>
                                 </svg>
                             </div>
-                            <div class="icon" draggable="true" data-type="note5">
+                            <div class="icon" data-type="note5">
                                 <svg width="20" height="20">
                                     <text font-family="Arial" x="10" y="10" font-size="1rem" text-anchor="middle" dominant-baseline="middle">5</text>
                                 </svg>
                             </div>
-                            <div class="icon" draggable="true" data-type="note6">
+                            <div class="icon" data-type="note6">
                                 <svg width="20" height="20">
                                     <text font-family="Arial" x="10" y="10" font-size="1rem" text-anchor="middle" dominant-baseline="middle">6</text>
                                 </svg>
                             </div>
-                            <div class="icon" draggable="true" data-type="note7">
+                            <div class="icon" data-type="note7">
                                 <svg width="20" height="20">
                                     <text font-family="Arial" x="10" y="10" font-size="1rem" text-anchor="middle" dominant-baseline="middle">7</text>
                                 </svg>
@@ -145,6 +145,11 @@
                 </div>
             </div>
         </main>
+        <div id="share-popup">
+            <button id="download-btn">Download</button>
+            <button id="print-btn">Print</button>
+            <button id="exit-share">X</button>
+        </div>
         <script src="/scripts/editor.js"></script>
         <script src="/scripts/svg.js"></script>
         <script type="module" src="/scripts/firebase.js"></script>
