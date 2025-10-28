@@ -2,23 +2,43 @@
 const container = document.getElementById("sheet-container");
 const width = container.clientWidth - 50;
 const height = 11*width/8.5;    // based on average paper sizes
-var noteSize = 0.03*width;
-var allPages = [];
+const bottomMargin = 0.075*height;
+let noteSize = 0.03*width;
 // Measures Variables
-var allMeasures = [];
 const measureHeight = 0.05*width;   // permanent
 const measureWidth = 0.05*width;    // default before anything is added
-var barWidth = 0.02*measureHeight;
 const defaultMeasureX = 0.1*width;  // x position
-const defaultMeasureY = 0.1*height; // y position
-let pageOneOffset = 0.075*height;   // offset due to title & other text on the first page
-let rowSpace = 0.025*height;        // space in between rows
+const defaultMeasureY = 0.15*width; // y position
+const rowLength = 0.8*width;        // length of each row
+const noteSpace = 0.01*width;       // space between notes
+let barWidth = 0.001*width;
+let rowSpace = 0.1*width;        // space inbetween rows (let users edit later)
+let dropZoneWidth = 0.03*width;
 
+let scoreData = {
+    meta: {
+        title: "Untitled",
+        subtitle: null,
+        composer: null,
+        arranger: null,
+        key: null,
+        tempo: null
+    },
+    measures: []    // will contain objects which represent each measure and will contain another array for notes
+};
 let selectedTool = null;
 
-// FUNCTIONS --------------------------------------------------------------------
+// Create the editor page (will expand infinitely)
+const page = SVG().addTo(container).size(width, height);
+const pageBg = page.rect(width, height).fill("white");
+let currHeight = height;
+
 const iconMap = {   // object matching icon types to creating an SVG on the page
-    note1: (x, y, page) => {
+    bar: (measure) => {
+        measure.line(measureWidth, 0, measureWidth, measureHeight)
+        .stroke({ width: barWidth, color: "black" });
+    },
+    note1: (x, y, page) => {    // page just refers to its "parent" usually a measure
         const g = page.group(); // create a group so you can add stuff to it later
         g.add(page.text("1")).font({ size:noteSize, family: "Arial" }).move(x, y);
     },
@@ -48,70 +68,58 @@ const iconMap = {   // object matching icon types to creating an SVG on the page
     },
 };
 
-function updatePageNumbers() {
-    allPages.forEach((p, i) => {    // p is the page itself (SVG), i is index
-        // Update the value (text) for each page's page number
-        p.pageNumber.text((i+1).toString());    // bc i is 0-indexed
-    });
+// FUNCTIONS --------------------------------------------------------------------
+function addNote(measure) {
+    // replace dropzone and create 2 drop zones to the left and right
+    // redraw the items in the measure & shift all measures afterwards
 }
 
-function addPage() {
-    const page = SVG().addTo(container).size(width, height);
-    page.rect(width, height).fill("white");
-
-    // Add page number (placeholder element)
-    const pageNum = page.text("").font({ size:noteSize, family: "Arial" })
-        .move(0.5*width, 0.92*height);
-    page.pageNumber = pageNum;  // assign it to a variable so it can be edited easily
-
-    allPages.push(page);
-    updatePageNumbers();
-    return page;
+function rerenderMeasures() {
+    // loop from changed note thru all measures until a line isn't pushed down
 }
 
-function removePage() { // only able to remove the last page (for now)
-    if (allPages.length > 1) {
-        // Confirm page delete
-        if (!confirm("Are you sure you want to delete page " + allPages.length + "?")) return;
-
-        const p = allPages.pop();   // returns the popped page too
-        p.remove();
-        updatePageNumbers();    // technically don't need this rn but imma keep it for later
-    } else alert("You cannot delete the last page.")
-}
-
-// Track where to add the next measure
-let currPageIndex = 0;
-let currMeasureX = defaultMeasureX;
-let currMeasureY = defaultMeasureY;
-function addMeasure() {
-    var page = allPages[currPageIndex];
-    if (allMeasures.length === 0) currMeasureY += pageOneOffset;
-
-    // If the measure needs to go onto the next row
-    if (currMeasureX + measureWidth > 0.9*width) {
-        currMeasureX = defaultMeasureX;
-        currMeasureY += measureHeight + rowSpace;
-
-        // If the measure needs to go onto the next page
-        if (currMeasureY + measureHeight > 0.9*height) {
-            currPageIndex++;
-
-            // Check if we need a new page added or not
-            if (allPages.length < currPageIndex+1) addPage();
-
-            page = allPages[currPageIndex];
-            currMeasureY = defaultMeasureY;
+function addMeasure() { // drop zone and bar
+    const index = scoreData.measures.length;
+    let row = 1;
+    let x = defaultMeasureX;
+    let newRow = false;
+    if (index > 0) {    // evaluate measures before this new measure
+        row = scoreData.measures[index-1].row;
+        x = scoreData.measures[index-1].x + scoreData.measures[index-1].width;
+        if (x-defaultMeasureX > rowLength) {
+            newRow = true;
+            row++;
+            x = defaultMeasureX;
         }
+    } 
+
+    let measure = {
+        order: index+1,
+        row: row,
+        x: x,        // based on the row it's on
+        width: measureWidth,    // before anything has been added
+        items: [{type: "bar"}]  // each note will be its own object {} with metadata
+    };
+
+    scoreData.measures.push(measure);
+    console.log(scoreData.measures);
+
+    // Check if we need to extend the page
+    const y = defaultMeasureY + row*rowSpace;
+    if (newRow && y+measureHeight > currHeight-bottomMargin) {
+        currHeight += rowSpace;
+        page.height(currHeight);
+        pageBg.height(currHeight);
     }
 
+    // Visually display the new measure using x & y values
     const measureGroup = page.group();
-    const dropZone = measureGroup.rect(0.6*measureWidth, measureHeight)
+    const dropZone = measureGroup.rect(dropZoneWidth, measureHeight)
         .fill("transparent")
-        .move(currMeasureX+0.2*measureWidth, currMeasureY);
-    measureGroup.line(currMeasureX+measureWidth, currMeasureY, currMeasureX+measureWidth, currMeasureY+measureHeight)
-        .stroke({ width: barWidth, color: "black" });
-    
+        .x(noteSpace);
+    iconMap["bar"](measureGroup);
+    measureGroup.move(x, y);
+
     dropZone.mouseover(() => {
         if (selectedTool) dropZone.fill("#cceeff")
     });
@@ -119,6 +127,7 @@ function addMeasure() {
     dropZone.click(() => {
         if (selectedTool && iconMap[selectedTool]) {
             // WIP: calculate x & y values (placeholders for now)
+            // break into new function pls 
             const x = 100;
             const y = 100;
             iconMap[selectedTool](x, y, measureGroup);
@@ -126,13 +135,15 @@ function addMeasure() {
     });
 }
 
-addPage();
+function showPreview() {
+    alert("Preview functionality in progress.\nWhen complete, it will be a popup showing all individual pages of sheet music without drop zones occupying any space. The preview will ideally have proper spacing for different note durations and different spacing for each horizontal line of music so that all lines start and end at the same x values (properly lined up)");
+}
 
 // EVENT LISTENERS --------------------------------------------------------------
 let prevSelected = null;
 document.querySelectorAll(".icon").forEach(icon => {
     icon.addEventListener("click", () => {
-        if (prevSelected) prevSelected.classList.remove("selected");
+        if (prevSelected && prevSelected !== icon) prevSelected.classList.remove("selected");
         icon.classList.toggle("selected");
         if (selectedTool === icon.dataset.type) {
             selectedTool = null;
@@ -144,23 +155,22 @@ document.querySelectorAll(".icon").forEach(icon => {
     });
 });
 
-// Adding/Removing Pages
-document.getElementById("add-page-btn").addEventListener("click", addPage);
-document.getElementById("remove-page-btn").addEventListener("click", removePage);
-
 // Adding Measures
 document.getElementById("add-measure-btn").addEventListener("click", () => {
     addMeasure();
 });
 
 // Adding Layout Details (title, composer, etc.)
-const titleText = allPages[0].text("Untitled")
+const titleText = page.text("Untitled")
     .font({ size: 0.05*width, family: "Arial" })
     .center(width/2, 0.1*height);
 
 document.getElementById("title-input").addEventListener("input", e => {
     titleText.text(e.target.value).center(width/2, 0.1*height);
 });
+
+// Preview
+document.getElementById("preview-btn").addEventListener("click", showPreview);
 
 // Saving
 document.getElementById("save-btn").addEventListener("click", () => {
@@ -171,6 +181,7 @@ document.getElementById("save-btn").addEventListener("click", () => {
 document.getElementById("share-btn").addEventListener("click", () => {
     document.getElementById("share-popup").classList.add("active");
 });
+
 document.getElementById("exit-share").addEventListener("click", () => {
     document.getElementById("share-popup").classList.remove("active");
 });
@@ -183,5 +194,5 @@ document.getElementById("print-btn").addEventListener("click", () => {
     alert("Printing functionality currently in progress")
 });
 
-var svgData = allPages[0].svg();   // XML
+var svgData = page.svg();   // XML
 console.log(svgData);

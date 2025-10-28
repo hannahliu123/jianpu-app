@@ -193,11 +193,6 @@ button:active {
     gap: 5px;
 }
 
-#add-page-btn, #remove-page-btn {
-    border: 1px solid black;
-    width: 50%;
-}
-
 #add-measure-btn {
     border: 1px solid black;
     width: 170px;   /* idk depends on future layouts */
