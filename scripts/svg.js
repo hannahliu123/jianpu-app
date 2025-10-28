@@ -8,7 +8,7 @@ let noteSize = 0.03*width;
 const measureHeight = 0.05*width;   // permanent
 const measureWidth = 0.05*width;    // default before anything is added
 const defaultMeasureX = 0.1*width;  // x position
-const defaultMeasureY = 0.15*width; // y position
+const defaultMeasureY = 0.275*width; // y position
 const rowLength = 0.8*width;        // length of each row
 const noteSpace = 0.01*width;       // space between notes
 let barWidth = 0.001*width;
@@ -127,7 +127,7 @@ function addMeasure() { // drop zone and bar
     dropZone.click(() => {
         if (selectedTool && iconMap[selectedTool]) {
             // WIP: calculate x & y values (placeholders for now)
-            // break into new function pls 
+            // break into new function pls to readjust everything after the note has been added
             const x = 100;
             const y = 100;
             iconMap[selectedTool](x, y, measureGroup);
@@ -157,6 +157,7 @@ document.querySelectorAll(".icon").forEach(icon => {
 
 // Adding Measures
 document.getElementById("add-measure-btn").addEventListener("click", () => {
+    for (let i=0; i < 5; ++i) addMeasure();
     addMeasure();
 });
 
@@ -164,9 +165,54 @@ document.getElementById("add-measure-btn").addEventListener("click", () => {
 const titleText = page.text("Untitled")
     .font({ size: 0.05*width, family: "Arial" })
     .center(width/2, 0.1*height);
-
 document.getElementById("title-input").addEventListener("input", e => {
     titleText.text(e.target.value).center(width/2, 0.1*height);
+});
+
+const subtitleText = page.text("None")
+    .font({ size: 0.03*width, family: "Arial" })
+    .center(width/2, 0.14*height)
+    .attr("visibility", "hidden");
+document.getElementById("subtitle-input").addEventListener("input", e => {
+    subtitleText.text(e.target.value).center(width/2, 0.14*height);
+});
+const subtitleCheck = document.getElementById("subtitle-checkbox");
+subtitleCheck.addEventListener("change", () => {
+    if (subtitleCheck.checked) {
+        subtitleText.attr('visibility', 'visible');
+    } else {
+        subtitleText.attr('visibility', 'hidden');
+    }
+});
+
+const compText = page.text("None")
+    .font({ size: 0.03*width, family: "Arial" })
+    .attr({x: 0.9*width, y: 0.17*height, "text-anchor": "end", "visibility": "hidden"});
+document.getElementById("composer-input").addEventListener("input", e => {
+    compText.text(e.target.value).attr({x: 0.9*width, y: 0.17*height, "text-anchor": "end"});
+});
+const compCheck = document.getElementById("composer-checkbox");
+compCheck.addEventListener("change", () => {
+    if (compCheck.checked) {
+        compText.attr('visibility', 'visible');
+    } else {
+        compText.attr('visibility', 'hidden');
+    }
+});
+
+const arrText = page.text("None")
+    .font({ size: 0.03*width, family: "Arial" })
+    .attr({x: 0.9*width, y: 0.2*height, "text-anchor": "end", "visibility": "hidden"});
+document.getElementById("arranger-input").addEventListener("input", e => {
+    arrText.text(e.target.value).attr({x: 0.9*width, y: 0.2*height, "text-anchor": "end"});
+});
+const arrCheck = document.getElementById("arranger-checkbox");
+arrCheck.addEventListener("change", () => {
+    if (arrCheck.checked) {
+        arrText.attr('visibility', 'visible');
+    } else {
+        arrText.attr('visibility', 'hidden');
+    }
 });
 
 // Preview
