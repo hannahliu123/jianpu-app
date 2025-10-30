@@ -8,12 +8,15 @@ let noteSize = 0.03*width;
 const measureHeight = 0.05*width;   // permanent
 const measureWidth = 0.05*width;    // default before anything is added
 const defaultMeasureX = 0.1*width;  // x position
-const defaultMeasureY = 0.275*width; // y position
 const rowLength = 0.8*width;        // length of each row
 const noteSpace = 0.01*width;       // space between notes
 let barWidth = 0.001*width;
 let rowSpace = 0.1*width;        // space inbetween rows (let users edit later)
 let dropZoneWidth = 0.03*width;
+// Layout Variables
+let isSubtitle = false;
+let isComposer = false;
+let isArranger = false;
 
 let scoreData = {
     meta: {
@@ -74,8 +77,22 @@ function addNote(measure) {
     // redraw the items in the measure & shift all measures afterwards
 }
 
-function rerenderMeasures() {
+function getStartY() {
+    let startY = 0.125;
+    if (isSubtitle) startY += 0.04;
+    if (isComposer) startY += 0.06;
+    if (isArranger) startY += 0.05;
+
+    return startY*width;
+}
+
+function layoutRerender() {
     // loop from changed note thru all measures until a line isn't pushed down
+    scoreData.measures.forEach(measure => {
+        const x = measure.x;
+        const y = getStartY() + measure.row*rowSpace;
+        measure.svg.move(x, y);
+    });
 }
 
 function addMeasure() { // drop zone and bar
@@ -101,11 +118,8 @@ function addMeasure() { // drop zone and bar
         items: [{type: "bar"}]  // each note will be its own object {} with metadata
     };
 
-    scoreData.measures.push(measure);
-    console.log(scoreData.measures);
-
     // Check if we need to extend the page
-    const y = defaultMeasureY + row*rowSpace;
+    const y = getStartY() + row*rowSpace;
     if (newRow && y+measureHeight > currHeight-bottomMargin) {
         currHeight += rowSpace;
         page.height(currHeight);
@@ -133,6 +147,9 @@ function addMeasure() { // drop zone and bar
             iconMap[selectedTool](x, y, measureGroup);
         }
     });
+
+    measure.svg = measureGroup;
+    scoreData.measures.push(measure);
 }
 
 function showPreview() {
@@ -157,7 +174,7 @@ document.querySelectorAll(".icon").forEach(icon => {
 
 // Adding Measures
 document.getElementById("add-measure-btn").addEventListener("click", () => {
-    for (let i=0; i < 5; ++i) addMeasure();
+    // for (let i=0; i < 5; ++i) addMeasure();
     addMeasure();
 });
 
@@ -179,9 +196,13 @@ document.getElementById("subtitle-input").addEventListener("input", e => {
 const subtitleCheck = document.getElementById("subtitle-checkbox");
 subtitleCheck.addEventListener("change", () => {
     if (subtitleCheck.checked) {
+        isSubtitle = true;
         subtitleText.attr('visibility', 'visible');
+        layoutRerender();
     } else {
+        isSubtitle = false;
         subtitleText.attr('visibility', 'hidden');
+        layoutRerender();
     }
 });
 
@@ -194,9 +215,13 @@ document.getElementById("composer-input").addEventListener("input", e => {
 const compCheck = document.getElementById("composer-checkbox");
 compCheck.addEventListener("change", () => {
     if (compCheck.checked) {
+        isComposer = true;
         compText.attr('visibility', 'visible');
+        layoutRerender();
     } else {
+        isComposer = false;
         compText.attr('visibility', 'hidden');
+        layoutRerender();
     }
 });
 
@@ -209,9 +234,13 @@ document.getElementById("arranger-input").addEventListener("input", e => {
 const arrCheck = document.getElementById("arranger-checkbox");
 arrCheck.addEventListener("change", () => {
     if (arrCheck.checked) {
+        isArranger = true;
         arrText.attr('visibility', 'visible');
+        layoutRerender();
     } else {
+        isArranger = false;
         arrText.attr('visibility', 'hidden');
+        layoutRerender();
     }
 });
 
