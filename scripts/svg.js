@@ -142,9 +142,15 @@ function addMeasure() { // drop zone and bar
         if (selectedTool && iconMap[selectedTool]) {
             // WIP: calculate x & y values (placeholders for now)
             // break into new function pls to readjust everything after the note has been added
-            const x = 100;
-            const y = 100;
-            iconMap[selectedTool](x, y, measureGroup);
+            const xItem = 100;
+            iconMap[selectedTool](xItem, y, measureGroup);
+            measure.items.push({
+                type: selectedTool,
+                x: xItem,
+                width: 5
+            });
+
+            console.log(measures);
         }
     });
 
@@ -186,60 +192,73 @@ document.getElementById("title-input").addEventListener("input", e => {
     titleText.text(e.target.value).center(width/2, 0.1*height);
 });
 
+let yComp = 0.15*height;
+let yArr = 0.15*height;
 const subtitleText = page.text("None")
     .font({ size: 0.03*width, family: "Arial" })
     .center(width/2, 0.14*height)
     .attr("visibility", "hidden");
-document.getElementById("subtitle-input").addEventListener("input", e => {
-    subtitleText.text(e.target.value).center(width/2, 0.14*height);
-});
+document.getElementById("subtitle-input").addEventListener("input", function(e) { subtitleText.text(e.target.value); });
+
+const compText = page.text("None")
+    .font({ size: 0.03*width, family: "Arial" })
+    .attr({x: 0.9*width, y: yComp, "text-anchor": "end", "visibility": "hidden"});
+document.getElementById("composer-input").addEventListener("input", function(e) { compText.text(e.target.value); });
+
+const arrText = page.text("None")
+    .font({ size: 0.03*width, family: "Arial" })
+    .attr({x: 0.9*width, y: yArr, "text-anchor": "end", "visibility": "hidden"});
+document.getElementById("arranger-input").addEventListener("input", function(e) { arrText.text(e.target.value); });
+
 const subtitleCheck = document.getElementById("subtitle-checkbox");
 subtitleCheck.addEventListener("change", () => {
     if (subtitleCheck.checked) {
         isSubtitle = true;
-        subtitleText.attr('visibility', 'visible');
+        subtitleText.attr("visibility", "visible");
+        yComp += 0.02*height;
+        compText.y(yComp);
+        yArr += 0.02*height;
+        arrText.y(yArr);
         layoutRerender();
     } else {
         isSubtitle = false;
-        subtitleText.attr('visibility', 'hidden');
+        subtitleText.attr("visibility", "hidden");
+        yComp -= 0.02*height;
+        compText.y(yComp);
+        yArr -= 0.02*height;
+        arrText.y(yArr);
         layoutRerender();
     }
 });
 
-const compText = page.text("None")
-    .font({ size: 0.03*width, family: "Arial" })
-    .attr({x: 0.9*width, y: 0.17*height, "text-anchor": "end", "visibility": "hidden"});
-document.getElementById("composer-input").addEventListener("input", e => {
-    compText.text(e.target.value).attr({x: 0.9*width, y: 0.17*height, "text-anchor": "end"});
-});
 const compCheck = document.getElementById("composer-checkbox");
 compCheck.addEventListener("change", () => {
     if (compCheck.checked) {
         isComposer = true;
-        compText.attr('visibility', 'visible');
+        compText.y(yComp);
+        compText.attr("visibility", "visible");
+        yArr += 0.025*height;
+        arrText.y(yArr);
         layoutRerender();
     } else {
         isComposer = false;
-        compText.attr('visibility', 'hidden');
+        compText.attr("visibility", "hidden");
+        yArr -= 0.025*height;
+        arrText.y(yArr);
         layoutRerender();
     }
 });
 
-const arrText = page.text("None")
-    .font({ size: 0.03*width, family: "Arial" })
-    .attr({x: 0.9*width, y: 0.2*height, "text-anchor": "end", "visibility": "hidden"});
-document.getElementById("arranger-input").addEventListener("input", e => {
-    arrText.text(e.target.value).attr({x: 0.9*width, y: 0.2*height, "text-anchor": "end"});
-});
 const arrCheck = document.getElementById("arranger-checkbox");
 arrCheck.addEventListener("change", () => {
     if (arrCheck.checked) {
         isArranger = true;
-        arrText.attr('visibility', 'visible');
+        arrText.y(yArr);
+        arrText.attr("visibility", "visible");
         layoutRerender();
     } else {
         isArranger = false;
-        arrText.attr('visibility', 'hidden');
+        arrText.attr("visibility", "hidden");
         layoutRerender();
     }
 });
