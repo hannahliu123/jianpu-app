@@ -9,7 +9,7 @@ const measureHeight = 0.05*width;   // permanent
 const measureWidth = 0.05*width;    // default before anything is added
 const defaultMeasureX = 0.1*width;  // x position
 const rowLength = 0.8*width;        // length of each row
-const noteSpace = 0.01*width;       // space between notes
+const spaceBetween = 0.01*width;       // space between notes
 let barWidth = 0.001*width;
 let rowSpace = 0.1*width;        // space inbetween rows (let users edit later)
 let dropZoneWidth = 0.03*width;
@@ -37,44 +37,134 @@ const pageBg = page.rect(width, height).fill("white");
 let currHeight = height;
 
 const iconMap = {   // object matching icon types to creating an SVG on the page
-    bar: (measure) => {
-        measure.line(measureWidth, 0, measureWidth, measureHeight)
-        .stroke({ width: barWidth, color: "black" });
+    bar: (x, measure) => {
+        const bar = measure.line(x, 0, x, measureHeight).stroke({ width: barWidth, color: "black" });
+        return bar;
     },
-    note1: (x, y, page) => {    // page just refers to its "parent" usually a measure
-        const g = page.group(); // create a group so you can add stuff to it later
-        g.add(page.text("1")).font({ size:noteSize, family: "Arial" }).move(x, y);
+    note1: (x, parent) => {    // parent is usually (always i think) a measure
+        const g = parent.group();   // create a group so you can add stuff to it later
+        g.text("1").font({ size:noteSize, family: "Arial" }).x(x);
+        return g;
     },
-    note2: (x, y, page) => {
-        const g = page.group();
-        g.add(page.text("2")).font({ size:noteSize, family: "Arial" }).move(x, y);
+    note2: (x, parent) => {
+        const g = parent.group();
+        g.text("2").font({ size:noteSize, family: "Arial" }).x(x);
+        return g;
     },
-    note3: (x, y, page) => {
-        const g = page.group();
-        g.add(page.text("3")).font({ size:noteSize, family: "Arial" }).move(x, y);
+    note3: (x, parent) => {
+        const g = parent.group();
+        g.text("3").font({ size:noteSize, family: "Arial" }).x(x);
+        return g;
     },
-    note4: (x, y, page) => {
-        const g = page.group();
-        g.add(page.text("4")).font({ size:noteSize, family: "Arial" }).move(x, y);
+    note4: (x, parent) => {
+        const g = parent.group();
+        g.text("4").font({ size:noteSize, family: "Arial" }).x(x);
+        return g;
     },
-    note5: (x, y, page) => {
-        const g = page.group();
-        g.add(page.text("5")).font({ size:noteSize, family: "Arial" }).move(x, y);
+    note5: (x, parent) => {
+        const g = parent.group();
+        g.text("5").font({ size:noteSize, family: "Arial" }).x(x);
+        return g;
     },
-    note6: (x, y, page) => {
-        const g = page.group();
-        g.add(page.text("6")).font({ size:noteSize, family: "Arial" }).move(x, y);
+    note6: (x, parent) => {
+        const g = parent.group();
+        g.text("6").font({ size:noteSize, family: "Arial" }).x(x);
+        return g;
     },
-    note7: (x, y, page) => {
-        const g = page.group();
-        g.add(page.text("7")).font({ size:noteSize, family: "Arial" }).move(x, y);
+    note7: (x, parent) => {
+        const g = parent.group();
+        g.text("7").font({ size:noteSize, family: "Arial" }).x(x);
+        return g;
     },
 };
 
+const itemData = {  // kinda useless rn idk if ill keep this
+    "note1": {width: 0.015*width, icon: "1"},
+    "note2": {width: 0.015*width, icon: "2"},
+    "note3": {width: 0.015*width, icon: "3"},
+    "note4": {width: 0.015*width, icon: "4"},
+    "note5": {width: 0.015*width, icon: "5"},
+    "note6": {width: 0.015*width, icon: "6"},
+    "note7": {width: 0.015*width, icon: "7"},
+    "rest": {width: 0.015*width, icon: "-"},
+}
+
 // FUNCTIONS --------------------------------------------------------------------
-function addNote(measure) {
-    // replace dropzone and create 2 drop zones to the left and right
-    // redraw the items in the measure & shift all measures afterwards
+function layoutRerender(start) {
+    // Loop from changed note thru all measures until a line isn't pushed down
+    let newX = -1;
+    let currRow = 1;
+    scoreData.measures.forEach(measure => {
+        if (measure.order < start) return;
+        if (newX !== -1) measure.x = newX;
+        if (measure.row < currRow) measure.row = currRow;
+        if (measure.x+measure.width-defaultMeasureX > rowLength) {
+            currRow++;
+            measure.row = currRow;
+            measure.x = defaultMeasureX;
+        }
+        const y = getStartY() + measure.row*rowSpace;
+        measure.svg.move(measure.x, y);
+
+        newX = measure.x + measure.width;
+
+        // need to stop if there is no overflow for the last measure)
+        // UNFINISHED
+    });
+}
+
+function addItem(id, measureGroup, measure) {
+    const index = measure.items.findIndex(item => item.id === id);  // index of drop zone in measure.items
+    const xItem = measure.items[index].x + dropZoneWidth + spaceBetween;
+    const itemSvg = iconMap[selectedTool](xItem, measureGroup);
+
+    let item = ({
+        type: selectedTool,
+        x: xItem,
+        width: itemData[selectedTool].width,   // might be wrong idk (maybe change values later)
+        svg: itemSvg
+    });
+
+    measure.items.splice(index+1, 0, item); // insert after old drop zone
+    createDropZone(measureGroup, measure, xItem+item.width+spaceBetween, index+2);
+
+    // adjust x values of all items after
+    let prevX = xItem + item.width + dropZoneWidth + 2*spaceBetween;
+    measure.items.forEach(item => {
+        if (measure.items.indexOf(item) <= index+2) return;
+        item.x = prevX;
+        item.svg.x(item.x);
+        prevX += item.width + spaceBetween;
+    });
+    
+    measure.width = prevX - spaceBetween;
+    layoutRerender(measure.order);
+}
+
+function createDropZone(measureGroup, measure, x, index) {
+    let id = "d" + crypto.randomUUID().slice(0,6);
+
+    const dropZone = measureGroup.rect(dropZoneWidth, measureHeight)
+        .fill("transparent")
+        .x(x);
+    dropZone.mouseover(() => {
+        if (selectedTool) dropZone.fill("#cceeff");
+    });
+    dropZone.mouseout(() => dropZone.fill("transparent"));
+    dropZone.click(() => {
+        if (selectedTool && iconMap[selectedTool]) {
+            addItem(id, measureGroup, measure);
+        }
+    });
+
+    let dropZoneObject = {
+        type: "drop",
+        x: x,
+        width: dropZoneWidth,
+        id: id,
+        svg: dropZone
+    };
+    measure.items.splice(index, 0, dropZoneObject);
 }
 
 function getStartY() {
@@ -86,15 +176,6 @@ function getStartY() {
     return startY*width;
 }
 
-function layoutRerender() {
-    // loop from changed note thru all measures until a line isn't pushed down
-    scoreData.measures.forEach(measure => {
-        const x = measure.x;
-        const y = getStartY() + measure.row*rowSpace;
-        measure.svg.move(x, y);
-    });
-}
-
 function addMeasure() { // drop zone and bar
     const index = scoreData.measures.length;
     let row = 1;
@@ -103,7 +184,7 @@ function addMeasure() { // drop zone and bar
     if (index > 0) {    // evaluate measures before this new measure
         row = scoreData.measures[index-1].row;
         x = scoreData.measures[index-1].x + scoreData.measures[index-1].width;
-        if (x-defaultMeasureX > rowLength) {
+        if (x+measureWidth-defaultMeasureX > rowLength) {
             newRow = true;
             row++;
             x = defaultMeasureX;
@@ -111,11 +192,11 @@ function addMeasure() { // drop zone and bar
     } 
 
     let measure = {
-        order: index+1,
+        order: index,
         row: row,
         x: x,        // based on the row it's on
         width: measureWidth,    // before anything has been added
-        items: [{type: "bar"}]  // each note will be its own object {} with metadata
+        items: [], // each note will be its own object {} with metadata (these include drop zones)
     };
 
     // Check if we need to extend the page
@@ -127,32 +208,11 @@ function addMeasure() { // drop zone and bar
     }
 
     // Visually display the new measure using x & y values
-    const measureGroup = page.group();
-    const dropZone = measureGroup.rect(dropZoneWidth, measureHeight)
-        .fill("transparent")
-        .x(noteSpace);
-    iconMap["bar"](measureGroup);
-    measureGroup.move(x, y);
+    const measureGroup = page.nested().move(x, y);
+    createDropZone(measureGroup, measure, spaceBetween, 0);
 
-    dropZone.mouseover(() => {
-        if (selectedTool) dropZone.fill("#cceeff")
-    });
-    dropZone.mouseout(() => dropZone.fill("transparent"));
-    dropZone.click(() => {
-        if (selectedTool && iconMap[selectedTool]) {
-            // WIP: calculate x & y values (placeholders for now)
-            // break into new function pls to readjust everything after the note has been added
-            const xItem = 100;
-            iconMap[selectedTool](xItem, y, measureGroup);
-            measure.items.push({
-                type: selectedTool,
-                x: xItem,
-                width: 5
-            });
-
-            console.log(measures);
-        }
-    });
+    const barSvg = iconMap["bar"](measureWidth, measureGroup);
+    measure.items.push({type: "bar", x: measureWidth, width: barWidth, svg: barSvg});
 
     measure.svg = measureGroup;
     scoreData.measures.push(measure);
@@ -198,17 +258,26 @@ const subtitleText = page.text("None")
     .font({ size: 0.03*width, family: "Arial" })
     .center(width/2, 0.14*height)
     .attr("visibility", "hidden");
-document.getElementById("subtitle-input").addEventListener("input", function(e) { subtitleText.text(e.target.value); });
+document.getElementById("subtitle-input").addEventListener("input", e => {
+    subtitleText.text(e.target.value);
+    scoreData.meta.subtitle = e.target.value;
+});
 
 const compText = page.text("None")
     .font({ size: 0.03*width, family: "Arial" })
     .attr({x: 0.9*width, y: yComp, "text-anchor": "end", "visibility": "hidden"});
-document.getElementById("composer-input").addEventListener("input", function(e) { compText.text(e.target.value); });
+document.getElementById("composer-input").addEventListener("input", e => {
+    compText.text(e.target.value);
+    scoreData.meta.composer = e.target.value;
+});
 
 const arrText = page.text("None")
     .font({ size: 0.03*width, family: "Arial" })
     .attr({x: 0.9*width, y: yArr, "text-anchor": "end", "visibility": "hidden"});
-document.getElementById("arranger-input").addEventListener("input", function(e) { arrText.text(e.target.value); });
+document.getElementById("arranger-input").addEventListener("input", e => {
+    arrText.text(e.target.value);
+    scoreData.meta.arranger = e.target.value;
+});
 
 const subtitleCheck = document.getElementById("subtitle-checkbox");
 subtitleCheck.addEventListener("change", () => {
@@ -219,7 +288,7 @@ subtitleCheck.addEventListener("change", () => {
         compText.y(yComp);
         yArr += 0.02*height;
         arrText.y(yArr);
-        layoutRerender();
+        layoutRerender(0);
     } else {
         isSubtitle = false;
         subtitleText.attr("visibility", "hidden");
@@ -227,7 +296,7 @@ subtitleCheck.addEventListener("change", () => {
         compText.y(yComp);
         yArr -= 0.02*height;
         arrText.y(yArr);
-        layoutRerender();
+        layoutRerender(0);
     }
 });
 
@@ -239,13 +308,13 @@ compCheck.addEventListener("change", () => {
         compText.attr("visibility", "visible");
         yArr += 0.025*height;
         arrText.y(yArr);
-        layoutRerender();
+        layoutRerender(0);
     } else {
         isComposer = false;
         compText.attr("visibility", "hidden");
         yArr -= 0.025*height;
         arrText.y(yArr);
-        layoutRerender();
+        layoutRerender(0);
     }
 });
 
@@ -255,11 +324,11 @@ arrCheck.addEventListener("change", () => {
         isArranger = true;
         arrText.y(yArr);
         arrText.attr("visibility", "visible");
-        layoutRerender();
+        layoutRerender(0);
     } else {
         isArranger = false;
         arrText.attr("visibility", "hidden");
-        layoutRerender();
+        layoutRerender(0);
     }
 });
 
