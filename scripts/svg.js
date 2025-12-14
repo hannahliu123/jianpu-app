@@ -149,8 +149,9 @@ function addItem(id, measureGroup, measure) {
 function createDropZone(measureGroup, measure, x, index) {
     let id = "d" + crypto.randomUUID().slice(0,6);
 
-    const dropLine = measureGroup.line(x+dropZoneWidth/2, 0, x+dropZoneWidth/2, measureHeight).stroke({ width: dropLineWidth, color: "transparent" });
-    const dropZone = measureGroup.rect(dropZoneWidth, measureHeight)
+    const dropZone = measureGroup.group();
+    const dropLine = dropZone.line(x+dropZoneWidth/2, 0, x+dropZoneWidth/2, measureHeight).stroke({ width: dropLineWidth, color: "transparent" });
+    dropZone.rect(dropZoneWidth, measureHeight)
         .fill("transparent")
         .x(x);
     dropZone.mouseover(() => {
