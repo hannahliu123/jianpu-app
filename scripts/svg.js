@@ -4,15 +4,18 @@ const width = container.clientWidth - 50;
 const height = 11*width/8.5;    // based on average paper sizes
 const bottomMargin = 0.075*height;
 let noteSize = 0.03*width;
+let textWidth = 3*width;
 // Measures Variables
 const measureHeight = 0.05*width;   // permanent
-const measureWidth = 0.05*width;    // default before anything is added
+const measureWidth = 0.02*width;    // default before anything is added
 const defaultMeasureX = 0.1*width;  // x position
 const rowLength = 0.8*width;        // length of each row
-const spaceBetween = 0.01*width;       // space between notes
+const spaceBetween = 0.0*width;       // space between notes
 let barWidth = 0.001*width;
+let barSpace = 0.01*width;      // total space a bar occupies (plus padding)
 let rowSpace = 0.1*width;        // space inbetween rows (let users edit later)
-let dropZoneWidth = 0.03*width;
+let dropZoneWidth = 0.01*width;
+let dropLineWidth = 0.0025*width;
 // Layout Variables
 let isSubtitle = false;
 let isComposer = false;
@@ -38,42 +41,44 @@ let currHeight = height;
 
 const iconMap = {   // object matching icon types to creating an SVG on the page
     bar: (x, measure) => {
-        const bar = measure.line(x, 0, x, measureHeight).stroke({ width: barWidth, color: "black" });
-        return bar;
+        const g = measure.group();
+        g.line(x-barSpace/2, 0, x-barSpace/2, measureHeight).stroke({ width: barWidth, color: "black" });
+        g.rect(barSpace, measureHeight).fill("transparent").cx(x-barSpace/2);
+        return g;
     },
     note1: (x, parent) => {    // parent is usually (always i think) a measure
         const g = parent.group();   // create a group so you can add stuff to it later
-        g.text("1").font({ size:noteSize, family: "Arial" }).x(x);
+        g.text("1").font({ size:noteSize, family: "Arial" }).x(x).cy(parent.bbox().height/2);
         return g;
     },
     note2: (x, parent) => {
         const g = parent.group();
-        g.text("2").font({ size:noteSize, family: "Arial" }).x(x);
+        g.text("2").font({ size:noteSize, family: "Arial" }).x(x).cy(parent.bbox().height/2);
         return g;
     },
     note3: (x, parent) => {
         const g = parent.group();
-        g.text("3").font({ size:noteSize, family: "Arial" }).x(x);
+        g.text("3").font({ size:noteSize, family: "Arial" }).x(x).cy(parent.bbox().height/2);
         return g;
     },
     note4: (x, parent) => {
         const g = parent.group();
-        g.text("4").font({ size:noteSize, family: "Arial" }).x(x);
+        g.text("4").font({ size:noteSize, family: "Arial" }).x(x).cy(parent.bbox().height/2);
         return g;
     },
     note5: (x, parent) => {
         const g = parent.group();
-        g.text("5").font({ size:noteSize, family: "Arial" }).x(x);
+        g.text("5").font({ size:noteSize, family: "Arial" }).x(x).cy(parent.bbox().height/2);
         return g;
     },
     note6: (x, parent) => {
         const g = parent.group();
-        g.text("6").font({ size:noteSize, family: "Arial" }).x(x);
+        g.text("6").font({ size:noteSize, family: "Arial" }).x(x).cy(parent.bbox().height/2);
         return g;
     },
     note7: (x, parent) => {
         const g = parent.group();
-        g.text("7").font({ size:noteSize, family: "Arial" }).x(x);
+        g.text("7").font({ size:noteSize, family: "Arial" }).x(x).cy(parent.bbox().height/2);
         return g;
     },
 };
@@ -144,13 +149,14 @@ function addItem(id, measureGroup, measure) {
 function createDropZone(measureGroup, measure, x, index) {
     let id = "d" + crypto.randomUUID().slice(0,6);
 
+    const dropLine = measureGroup.line(x+dropZoneWidth/2, 0, x+dropZoneWidth/2, measureHeight).stroke({ width: dropLineWidth, color: "transparent" });
     const dropZone = measureGroup.rect(dropZoneWidth, measureHeight)
         .fill("transparent")
         .x(x);
     dropZone.mouseover(() => {
-        if (selectedTool) dropZone.fill("#cceeff");
+        if (selectedTool) dropLine.stroke("#37d4ffff");
     });
-    dropZone.mouseout(() => dropZone.fill("transparent"));
+    dropZone.mouseout(() => dropLine.stroke("transparent"));
     dropZone.click(() => {
         if (selectedTool && iconMap[selectedTool]) {
             addItem(id, measureGroup, measure);
@@ -212,7 +218,7 @@ function addMeasure() { // drop zone and bar
     createDropZone(measureGroup, measure, spaceBetween, 0);
 
     const barSvg = iconMap["bar"](measureWidth, measureGroup);
-    measure.items.push({type: "bar", x: measureWidth, width: barWidth, svg: barSvg});
+    measure.items.push({type: "bar", x: measureWidth, width: barSpace, svg: barSvg});
 
     measure.svg = measureGroup;
     scoreData.measures.push(measure);
