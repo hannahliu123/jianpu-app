@@ -205,19 +205,30 @@ button:active {
     position: relative;         /* later for zooming in/out */
 }
 
+#zoom-controls {
+    display: flex;
+    gap: 2px;
+    position: absolute;
+    top: 0;
+    right: 16px;
+}
+
+#zoom-controls button {
+    border: 1px solid gray;
+    padding: 0 5px;
+}
+
 #sheet-container {
     flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 3vw;
-    padding: 2vw 0;
     overflow-y: scroll;
 }
 
 #sheet-container > svg {
     flex-shrink: 0;
-    border: 1px solid gray;
 }
 
 #sheet-container g {

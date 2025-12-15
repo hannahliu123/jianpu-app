@@ -1,6 +1,9 @@
 // VARIABLES --------------------------------------------------------------------
 const container = document.getElementById("sheet-container");
-const width = container.clientWidth - 50;
+const screenWidth = container.clientWidth;
+const screenHeight = container.clientHeight;
+const autoMargin = 25;
+const width = screenWidth - 2*autoMargin;
 const height = 11*width/8.5;    // based on average paper sizes
 const bottomMargin = 0.075*height;
 let noteSize = 0.03*width;
@@ -35,8 +38,9 @@ let scoreData = {
 let selectedTool = null;
 
 // Create the editor page (will expand infinitely)
-const page = SVG().addTo(container).size(width, height);
-const pageBg = page.rect(width, height).fill("white");
+const page = SVG().addTo(container).size(screenWidth, screenHeight).viewbox(-autoMargin, -autoMargin, screenWidth, screenHeight);
+page.panZoom({ zoomMin: 0.25, zoomMax: 5, zoomFactor: 0.1 });
+const pageBg = page.rect(width, height).fill("white").stroke({ color: "gray", width: 0.25 });
 let currHeight = height;
 
 const iconMap = {   // object matching icon types to creating an SVG on the page
@@ -44,6 +48,7 @@ const iconMap = {   // object matching icon types to creating an SVG on the page
         const g = measure.group();
         g.line(x-barSpace/2, 0, x-barSpace/2, measureHeight).stroke({ width: barWidth, color: "black" });
         g.rect(barSpace, measureHeight).fill("transparent").cx(x-barSpace/2);
+        g.size(g.bbox().width, g.bbox().height);
         return g;
     },
     note1: (x, parent) => {    // parent is usually (always i think) a measure
@@ -338,6 +343,10 @@ arrCheck.addEventListener("change", () => {
         layoutRerender(0);
     }
 });
+
+// Zooming (doesn't really work but i don't think panzoom can go in increments...)
+document.getElementById("zoom-in").addEventListener("click", () => page.zoom(2));
+document.getElementById("zoom-out").addEventListener("click", () => page.zoom(1));
 
 // Preview
 document.getElementById("preview-btn").addEventListener("click", showPreview);
