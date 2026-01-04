@@ -53,37 +53,37 @@ const iconMap = {   // object matching icon types to creating an SVG on the page
     },
     note1: (x, parent) => {    // parent is usually (always i think) a measure
         const g = parent.group();   // create a group so you can add stuff to it later
-        g.text("1").font({ size:noteSize, family: "Arial" }).x(x).cy(parent.bbox().height/2);
+        g.text("1").font({ size:noteSize, family: "Arial" }).x(x).cy(measureHeight/2);
         return g;
     },
     note2: (x, parent) => {
         const g = parent.group();
-        g.text("2").font({ size:noteSize, family: "Arial" }).x(x).cy(parent.bbox().height/2);
+        g.text("2").font({ size:noteSize, family: "Arial" }).x(x).cy(measureHeight/2);
         return g;
     },
     note3: (x, parent) => {
         const g = parent.group();
-        g.text("3").font({ size:noteSize, family: "Arial" }).x(x).cy(parent.bbox().height/2);
+        g.text("3").font({ size:noteSize, family: "Arial" }).x(x).cy(measureHeight/2);
         return g;
     },
     note4: (x, parent) => {
         const g = parent.group();
-        g.text("4").font({ size:noteSize, family: "Arial" }).x(x).cy(parent.bbox().height/2);
+        g.text("4").font({ size:noteSize, family: "Arial" }).x(x).cy(measureHeight/2);
         return g;
     },
     note5: (x, parent) => {
         const g = parent.group();
-        g.text("5").font({ size:noteSize, family: "Arial" }).x(x).cy(parent.bbox().height/2);
+        g.text("5").font({ size:noteSize, family: "Arial" }).x(x).cy(measureHeight/2);
         return g;
     },
     note6: (x, parent) => {
         const g = parent.group();
-        g.text("6").font({ size:noteSize, family: "Arial" }).x(x).cy(parent.bbox().height/2);
+        g.text("6").font({ size:noteSize, family: "Arial" }).x(x).cy(measureHeight/2);
         return g;
     },
     note7: (x, parent) => {
         const g = parent.group();
-        g.text("7").font({ size:noteSize, family: "Arial" }).x(x).cy(parent.bbox().height/2);
+        g.text("7").font({ size:noteSize, family: "Arial" }).x(x).cy(measureHeight/2);
         return g;
     },
 };
@@ -271,7 +271,7 @@ const subtitleText = page.text("None")
     .center(width/2, 0.14*height)
     .attr("visibility", "hidden");
 document.getElementById("subtitle-input").addEventListener("input", e => {
-    subtitleText.text(e.target.value);
+    subtitleText.text(e.target.value).center(width/2, 0.14*height);
     scoreData.meta.subtitle = e.target.value;
 });
 
