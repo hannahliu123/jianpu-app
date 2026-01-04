@@ -1,28 +1,11 @@
-// VARIABLES --------------------------------------------------------------------
-const container = document.getElementById("sheet-container");
-const screenWidth = container.clientWidth;
-const screenHeight = container.clientHeight;
-const autoMargin = 25;
-const width = screenWidth - 2*autoMargin;
-const height = 11*width/8.5;    // based on average paper sizes
-const bottomMargin = 0.075*height;
-let noteSize = 0.03*width;
-let textWidth = 3*width;
-// Measures Variables
-const measureHeight = 0.05*width;   // permanent
-const measureWidth = 0.02*width;    // default before anything is added
-const defaultMeasureX = 0.1*width;  // x position
-const rowLength = 0.8*width;        // length of each row
-const spaceBetween = 0.0*width;       // space between notes
-let barWidth = 0.001*width;
-let barSpace = 0.01*width;      // total space a bar occupies (plus padding)
-let rowSpace = 0.1*width;        // space inbetween rows (let users edit later)
-let dropZoneWidth = 0.01*width;
-let dropLineWidth = 0.0025*width;
-// Layout Variables
-let isSubtitle = false;
-let isComposer = false;
-let isArranger = false;
+import { SVG } from '@svgdotjs/svg.js';
+import '@svgdotjs/svg.panzoom.js';
+import { setupEditorUI } from './setup.js';
+import './style.css';      // replaces the <link> tag in HTML
+
+import { container, screenWidth, screenHeight, autoMargin, width, height, bottomMargin, noteSize, textWidth, measureHeight, measureWidth, defaultMeasureX, rowLength, spaceBetween, barWidth, barSpace, rowSpace, dropZoneWidth, dropLineWidth } from './constants.js';
+
+setupEditorUI();
 
 let scoreData = {
     meta: {
@@ -257,6 +240,10 @@ document.getElementById("add-measure-btn").addEventListener("click", () => {
 });
 
 // #region Adding Layout Details (title, composer, etc.)
+let isSubtitle = false;
+let isComposer = false;
+let isArranger = false;
+
 const titleText = page.text("Untitled")
     .font({ size: 0.05*width, family: "Arial" })
     .center(width/2, 0.1*height);

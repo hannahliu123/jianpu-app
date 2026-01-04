@@ -1,3 +1,6 @@
+// MAYBE LATER: capitalize variables that won't change
+
+export const container = document.getElementById("sheet-container");
 export const screenWidth = container.clientWidth;
 export const screenHeight = container.clientHeight;
 export const autoMargin = 25;
@@ -19,7 +22,3 @@ export let rowSpace = 0.1*width;        // space inbetween rows (let users edit 
 export let dropZoneWidth = 0.01*width;
 export let dropLineWidth = 0.0025*width;
 
-// Layout Variables
-export let isSubtitle = false;
-export let isComposer = false;
-export let isArranger = false;
