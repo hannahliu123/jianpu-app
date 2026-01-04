@@ -1,8 +1,8 @@
 import { SVG } from '@svgdotjs/svg.js';
 import '@svgdotjs/svg.panzoom.js';
-import { setupEditorUI } from './setup.js';
 import './style.css';      // replaces the <link> tag in HTML
-
+import { setupEditorUI } from './setup.js';
+import { } from './renderer.js';
 import { container, screenWidth, screenHeight, autoMargin, width, height, bottomMargin, noteSize, textWidth, measureHeight, measureWidth, defaultMeasureX, rowLength, spaceBetween, barWidth, barSpace, rowSpace, dropZoneWidth, dropLineWidth } from './constants.js';
 
 setupEditorUI();
