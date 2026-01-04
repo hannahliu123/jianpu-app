@@ -1,0 +1,253 @@
+* {
+    box-sizing: border-box;
+}
+
+:root {
+    --bg: #e0e0e0;
+    --text: #212121;
+    --top-bar: #2d2d2d;
+    --top-bar-text: #ffffff;
+    --title-focus: #e3e3e3;
+    --pin-bg: #fcfcfc;
+    --sidebar-bg: #f9f9f9;
+    --sidebar-bg-active: #dbdbdb;
+    --sidebar-btn: #ffffff;
+    --edit-bg: #f3f3f3;
+    --btn: #ffffff;
+    --btn-hover: #e9e9e9;
+    --btn-active: #d3d3d3;
+    --icon-selected: #c9e3f9;
+    --icon-hover: #e3edf7;
+    --share-popup: #c1c1c1;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: "Outfit", sans-serif;
+    background-color: var(--bg);
+    color: var(--text);
+    margin: 0;
+    padding: 0;
+    font-size: 1rem;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    font-size: 0.8rem;
+}
+
+input[type="text"] {
+    font-family: "Outfit", sans-serif;
+    font-size: 0.8rem;
+    width: 100%;
+}
+
+p {
+    font-size: 0.8rem;
+    margin: 0;
+}
+
+button {
+    cursor: pointer;
+    font-family: "Outfit", sans-serif;
+    background-color: var(--btn);
+    color: var(--text);
+    border: none;
+    border-radius: 2px;
+}
+
+button:hover {
+    background-color: var(--btn-hover);
+}
+
+button:active {
+    background-color: var(--btn-active);
+}
+
+#topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: var(--top-bar);
+    color: var(--top-bar-text);
+    padding: 10px;
+}
+
+#project-title {
+    font-size: 1rem;
+    border: none;
+    background-color: transparent;
+    color: var(--top-bar-text);
+    field-sizing: content;
+    outline: none;
+}
+
+#project-title:focus {
+    border-bottom: 1px solid var(--top-bar-text);
+    color: var(--title-focus);
+}
+
+#main-layout {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+#pin-bar {
+    background-color: var(--pin-bg);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+}
+
+#main-section {
+    flex-grow: 1;
+    display: flex;
+    width: 100vw;
+    overflow: hidden;
+}
+
+#sidebar {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--sidebar-bg);
+    width: 75px;
+    border-right: 1px solid rgba(0, 0, 0, 0.5);
+}
+
+.section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    cursor: pointer;
+    padding: 15px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+}
+
+.section > p {
+    font-size: 0.8rem;
+}
+
+.section:hover {
+    background-color: var(--edit-bg);
+}
+
+#edit-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    background-color: var(--edit-bg);
+    max-width: 20vw;
+    min-width: 250px;
+    overflow-y: scroll;
+    padding: 10px 15px 20px 15px;
+    border-right: 1px solid rgba(0, 0, 0, 0.25);
+}
+
+#edit-panel > div {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.edit-panel-headers {
+    margin: 0;
+}
+
+#notes-container {
+    display: flex;
+    gap: 5px;
+}
+
+.icon {
+    width: min-content;
+}
+
+.icon:hover {
+    background-color: var(--icon-hover);
+}
+
+.icon.selected {
+    background-color: var(--icon-selected);
+}
+
+.icon svg {
+    display: block;
+    cursor: pointer;
+    border: 1px dashed black;
+}
+
+.input-container {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+#add-measure-btn {
+    border: 1px solid black;
+    width: 170px;   /* idk depends on future layouts */
+}
+
+#sheet-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;         /* later for zooming in/out */
+}
+
+#zoom-controls {
+    display: flex;
+    gap: 2px;
+    position: absolute;
+    top: 0;
+    right: 16px;
+}
+
+#zoom-controls button {
+    border: 1px solid gray;
+    padding: 0 5px;
+}
+
+#sheet-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3vw;
+    overflow-y: scroll;
+}
+
+#sheet-container > svg {
+    flex-shrink: 0;
+}
+
+#sheet-container g {
+    flex-shrink: 0;
+    border: 1px solid red;
+}
+
+#share-popup {
+    display: none;
+    padding: 10px;
+    background-color: var(--share-popup);
+}
+
+#share-popup.active {
+    display: block;
+    position: fixed;
+    top: 45px;
+    right: 5px;
+}
+
+@media print {
+}

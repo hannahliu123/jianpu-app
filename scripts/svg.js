@@ -256,7 +256,7 @@ document.getElementById("add-measure-btn").addEventListener("click", () => {
     addMeasure();
 });
 
-// Adding Layout Details (title, composer, etc.)
+// #region Adding Layout Details (title, composer, etc.)
 const titleText = page.text("Untitled")
     .font({ size: 0.05*width, family: "Arial" })
     .center(width/2, 0.1*height);
@@ -343,6 +343,7 @@ arrCheck.addEventListener("change", () => {
         layoutRerender(0);
     }
 });
+// #endregion
 
 // Zooming (doesn't really work but i don't think panzoom can go in increments...)
 document.getElementById("zoom-in").addEventListener("click", () => page.zoom(2));
