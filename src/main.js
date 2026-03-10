@@ -1,233 +1,103 @@
 import { SVG } from '@svgdotjs/svg.js';
 import '@svgdotjs/svg.panzoom.js';
 import './style.css';      // replaces the <link> tag in HTML
-import { setupEditorUI } from './setup.js';
-import { } from './renderer.js';
-import { container, screenWidth, screenHeight, autoMargin, width, height, bottomMargin, noteSize, textWidth, measureHeight, measureWidth, defaultMeasureX, rowLength, spaceBetween, barWidth, barSpace, rowSpace, dropZoneWidth, dropLineWidth } from './constants.js';
+import * as State from './state.js';
+import * as CONFIG from './constants.js';
+import { setupEditorUI, setupHeader } from './setup.js';
+import { addItem, addMeasureData } from './logic.js';
+import { createMeasure, createPageGroup } from './renderer.js';
 
-setupEditorUI();
+// Create the editor canvas (will expand infinitely)
+const canvas = SVG().addTo(CONFIG.container)
+    .size(CONFIG.screenWidth, CONFIG.screenHeight)
+    .viewbox(-CONFIG.autoMargin, -CONFIG.autoMargin, CONFIG.screenWidth, CONFIG.screenHeight);
+canvas.panZoom({ zoomMin: 0.25, zoomMax: 5, zoomFactor: 0.1 });
 
-let scoreData = {
-    meta: {
-        title: "Untitled",
-        subtitle: null,
-        composer: null,
-        arranger: null,
-        key: null,
-        tempo: null
-    },
-    measures: []    // will contain objects which represent each measure and will contain another array for notes
-};
-let selectedTool = null;
+setupEditorUI();    // Initialize UI
+const musicLayer = canvas.group().id("music-layer");
+const uiLayer = canvas.group().id("ui-layer");  // Always in front :)
+const firstPage = createPageGroup(0, musicLayer);   // use this as a placeholder/default page
+setupHeader(firstPage);    // set up header on first page
 
-// Create the editor page (will expand infinitely)
-const page = SVG().addTo(container).size(screenWidth, screenHeight).viewbox(-autoMargin, -autoMargin, screenWidth, screenHeight);
-page.panZoom({ zoomMin: 0.25, zoomMax: 5, zoomFactor: 0.1 });
-const pageBg = page.rect(width, height).fill("white").stroke({ color: "gray", width: 0.25 });
-let currHeight = height;
+const dropZone = uiLayer.rect(2, CONFIG.measureHeight)
+    .fill("#37d4ffff")
+    .hide();
 
-const iconMap = {   // object matching icon types to creating an SVG on the page
-    bar: (x, measure) => {
-        const g = measure.group();
-        g.line(x-barSpace/2, 0, x-barSpace/2, measureHeight).stroke({ width: barWidth, color: "black" });
-        g.rect(barSpace, measureHeight).fill("transparent").cx(x-barSpace/2);
-        g.size(g.bbox().width, g.bbox().height);
-        return g;
-    },
-    note1: (x, parent) => {    // parent is usually (always i think) a measure
-        const g = parent.group();   // create a group so you can add stuff to it later
-        g.text("1").font({ size:noteSize, family: "Arial" }).x(x).cy(measureHeight/2);
-        return g;
-    },
-    note2: (x, parent) => {
-        const g = parent.group();
-        g.text("2").font({ size:noteSize, family: "Arial" }).x(x).cy(measureHeight/2);
-        return g;
-    },
-    note3: (x, parent) => {
-        const g = parent.group();
-        g.text("3").font({ size:noteSize, family: "Arial" }).x(x).cy(measureHeight/2);
-        return g;
-    },
-    note4: (x, parent) => {
-        const g = parent.group();
-        g.text("4").font({ size:noteSize, family: "Arial" }).x(x).cy(measureHeight/2);
-        return g;
-    },
-    note5: (x, parent) => {
-        const g = parent.group();
-        g.text("5").font({ size:noteSize, family: "Arial" }).x(x).cy(measureHeight/2);
-        return g;
-    },
-    note6: (x, parent) => {
-        const g = parent.group();
-        g.text("6").font({ size:noteSize, family: "Arial" }).x(x).cy(measureHeight/2);
-        return g;
-    },
-    note7: (x, parent) => {
-        const g = parent.group();
-        g.text("7").font({ size:noteSize, family: "Arial" }).x(x).cy(measureHeight/2);
-        return g;
-    },
-};
+function getInsertionData(e) {
+    // e.target is the item your mouse is hovering over
+    const measureElement = e.target.closest('.measure-group');
+    if (!measureElement) return null;
 
-const itemData = {  // kinda useless rn idk if ill keep this
-    "note1": {width: 0.015*width, icon: "1"},
-    "note2": {width: 0.015*width, icon: "2"},
-    "note3": {width: 0.015*width, icon: "3"},
-    "note4": {width: 0.015*width, icon: "4"},
-    "note5": {width: 0.015*width, icon: "5"},
-    "note6": {width: 0.015*width, icon: "6"},
-    "note7": {width: 0.015*width, icon: "7"},
-    "rest": {width: 0.015*width, icon: "-"},
-}
+    // convert screen mouse position to SVG coordinates
+    const svgPt = canvas.point(e.clientX, e.clientY);
 
-// FUNCTIONS --------------------------------------------------------------------
-function layoutRerender(start) {
-    // Loop from changed note thru all measures until a line isn't pushed down
-    let newX = -1;
-    let currRow = 1;
-    scoreData.measures.forEach(measure => {
-        if (measure.order < start) return;
-        if (newX !== -1) measure.x = newX;
-        if (measure.row < currRow) measure.row = currRow;
-        if (measure.x+measure.width-defaultMeasureX > rowLength) {
-            currRow++;
-            measure.row = currRow;
-            measure.x = defaultMeasureX;
-        }
-        const y = getStartY() + measure.row*rowSpace;
-        measure.svg.move(measure.x, y);
+    // find measure data (⭐⭐ you'll need y-values later)
+    const measureId = measureElement.id;
+    const measure = State.scoreData.measures.find(m => m.id === measureId);
+    const relativeX = svgPt.x - measure.x;  // relative x inside the measure
 
-        newX = measure.x + measure.width;
-
-        // need to stop if there is no overflow for the last measure)
-        // UNFINISHED
-    });
-}
-
-function addItem(id, measureGroup, measure) {
-    const index = measure.items.findIndex(item => item.id === id);  // index of drop zone in measure.items
-    const xItem = measure.items[index].x + dropZoneWidth + spaceBetween;
-    const itemSvg = iconMap[selectedTool](xItem, measureGroup);
-
-    let item = ({
-        type: selectedTool,
-        x: xItem,
-        width: itemData[selectedTool].width,   // might be wrong idk (maybe change values later)
-        svg: itemSvg
-    });
-
-    measure.items.splice(index+1, 0, item); // insert after old drop zone
-    createDropZone(measureGroup, measure, xItem+item.width+spaceBetween, index+2);
-
-    // adjust x values of all items after
-    let prevX = xItem + item.width + dropZoneWidth + 2*spaceBetween;
-    measure.items.forEach(item => {
-        if (measure.items.indexOf(item) <= index+2) return;
-        item.x = prevX;
-        item.svg.x(item.x);
-        prevX += item.width + spaceBetween;
-    });
-    
-    measure.width = prevX - spaceBetween;
-    layoutRerender(measure.order);
-}
-
-function createDropZone(measureGroup, measure, x, index) {
-    let id = "d" + crypto.randomUUID().slice(0,6);
-
-    const dropZone = measureGroup.group();
-    const dropLine = dropZone.line(x+dropZoneWidth/2, 0, x+dropZoneWidth/2, measureHeight).stroke({ width: dropLineWidth, color: "transparent" });
-    dropZone.rect(dropZoneWidth, measureHeight)
-        .fill("transparent")
-        .x(x);
-    dropZone.mouseover(() => {
-        if (selectedTool) dropLine.stroke("#37d4ffff");
-    });
-    dropZone.mouseout(() => dropLine.stroke("transparent"));
-    dropZone.click(() => {
-        if (selectedTool && iconMap[selectedTool]) {
-            addItem(id, measureGroup, measure);
-        }
-    });
-
-    let dropZoneObject = {
-        type: "drop",
-        x: x,
-        width: dropZoneWidth,
-        id: id,
-        svg: dropZone
-    };
-    measure.items.splice(index, 0, dropZoneObject);
-}
-
-function getStartY() {
-    let startY = 0.125;
-    if (isSubtitle) startY += 0.04;
-    if (isComposer) startY += 0.06;
-    if (isArranger) startY += 0.05;
-
-    return startY*width;
-}
-
-function addMeasure() { // drop zone and bar
-    const index = scoreData.measures.length;
-    let row = 1;
-    let x = defaultMeasureX;
-    let newRow = false;
-    if (index > 0) {    // evaluate measures before this new measure
-        row = scoreData.measures[index-1].row;
-        x = scoreData.measures[index-1].x + scoreData.measures[index-1].width;
-        if (x+measureWidth-defaultMeasureX > rowLength) {
-            newRow = true;
-            row++;
-            x = defaultMeasureX;
-        }
-    } 
-
-    let measure = {
-        order: index,
-        row: row,
-        x: x,        // based on the row it's on
-        width: measureWidth,    // before anything has been added
-        items: [], // each note will be its own object {} with metadata (these include drop zones)
-    };
-
-    // Check if we need to extend the page
-    const y = getStartY() + row*rowSpace;
-    if (newRow && y+measureHeight > currHeight-bottomMargin) {
-        currHeight += rowSpace;
-        page.height(currHeight);
-        pageBg.height(currHeight);
+    // find insertion index (where the drop zone should snap)
+    let insertX = 0;
+    let accumulatedX = 0;
+    let insertIndex = 0;
+    for (let i = 0; i < measure.items.length; i++) {    // ⭐⭐ CHANGE HOVER DETECTION LATER 
+        const item = measure.items[i];
+        const itemWidth = item.width;
+        // if mouse is past the halfway point of this note, move the line to the right of it
+        if (relativeX > accumulatedX + (itemWidth / 2)) {
+            insertX = accumulatedX + itemWidth + (CONFIG.itemSpacing / 2);
+            insertIndex = i+1;  // after current item
+        } accumulatedX += itemWidth + CONFIG.itemSpacing;
     }
 
-    // Visually display the new measure using x & y values
-    const measureGroup = page.nested().move(x, y);
-    createDropZone(measureGroup, measure, spaceBetween, 0);
-
-    const barSvg = iconMap["bar"](measureWidth, measureGroup);
-    measure.items.push({type: "bar", x: measureWidth, width: barSpace, svg: barSvg});
-
-    measure.svg = measureGroup;
-    scoreData.measures.push(measure);
+    // data for the measure, x pos relative to measure, index to insert in measure
+    return { measure, insertX, insertIndex };   // this is an object!
 }
 
-function showPreview() {
-    alert("Preview functionality in progress.\nWhen complete, it will be a popup showing all individual pages of sheet music without drop zones occupying any space. The preview will ideally have proper spacing for different note durations and different spacing for each horizontal line of music so that all lines start and end at the same x values (properly lined up)");
+canvas.on("mousemove", (e) => {   // show dropZone
+    if (!State.selectedTool) {    // no selected tool
+    dropZone.hide();
+        return;
+    }
+    
+    const data = getInsertionData(e);
+    if (data) {
+        const yOffset = data.measure.pageIndex * (CONFIG.pageHeight + CONFIG.pageSpace);
+        dropZone.move(data.measure.x + data.insertX, data.measure.y + yOffset).show();
+    } else dropZone.hide();
+});
+
+canvas.on('click', (e) => {   // add item
+    if (!State.selectedTool) return;
+
+    const data = getInsertionData(e);
+    if (data) {
+        addItem(data.insertIndex, data.measure, State.selectedTool, State.scoreData);
+    }
+});
+
+function addMeasure() { // add to end of music
+    const newMeasure = addMeasureData(State.scoreData);
+    // put it on the firstPage (default) for now but its page & position will be updated later
+    newMeasure.svgGroup = createMeasure(newMeasure, firstPage)
+    // add the bar, which also later calls layoutRerender()
+    addItem(0, newMeasure, "bar", State.scoreData);
 }
 
-// EVENT LISTENERS --------------------------------------------------------------
+// Selecting a tool (note)
 let prevSelected = null;
 document.querySelectorAll(".icon").forEach(icon => {
     icon.addEventListener("click", () => {
-        if (prevSelected && prevSelected !== icon) prevSelected.classList.remove("selected");
-        icon.classList.toggle("selected");
-        if (selectedTool === icon.dataset.type) {
-            selectedTool = null;
+        if (prevSelected && prevSelected !== icon) {
+            prevSelected.classList.remove("selected");
+        } icon.classList.toggle("selected");
+
+        const clickedTool = icon.dataset.type;
+        if (State.selectedTool === clickedTool) {
+            State.setTool(null);
             document.body.style.cursor = "auto";
         } else {
-            selectedTool = icon.dataset.type
+            State.setTool(clickedTool);
             document.body.style.cursor = "pointer";
         } prevSelected = icon;
     });
@@ -239,105 +109,14 @@ document.getElementById("add-measure-btn").addEventListener("click", () => {
     addMeasure();
 });
 
-// #region Adding Layout Details (title, composer, etc.)
-let isSubtitle = false;
-let isComposer = false;
-let isArranger = false;
-
-const titleText = page.text("Untitled")
-    .font({ size: 0.05*width, family: "Arial" })
-    .center(width/2, 0.1*height);
-document.getElementById("title-input").addEventListener("input", e => {
-    titleText.text(e.target.value).center(width/2, 0.1*height);
-});
-
-let yComp = 0.15*height;
-let yArr = 0.15*height;
-const subtitleText = page.text("None")
-    .font({ size: 0.03*width, family: "Arial" })
-    .center(width/2, 0.14*height)
-    .attr("visibility", "hidden");
-document.getElementById("subtitle-input").addEventListener("input", e => {
-    subtitleText.text(e.target.value).center(width/2, 0.14*height);
-    scoreData.meta.subtitle = e.target.value;
-});
-
-const compText = page.text("None")
-    .font({ size: 0.03*width, family: "Arial" })
-    .attr({x: 0.9*width, y: yComp, "text-anchor": "end", "visibility": "hidden"});
-document.getElementById("composer-input").addEventListener("input", e => {
-    compText.text(e.target.value);
-    scoreData.meta.composer = e.target.value;
-});
-
-const arrText = page.text("None")
-    .font({ size: 0.03*width, family: "Arial" })
-    .attr({x: 0.9*width, y: yArr, "text-anchor": "end", "visibility": "hidden"});
-document.getElementById("arranger-input").addEventListener("input", e => {
-    arrText.text(e.target.value);
-    scoreData.meta.arranger = e.target.value;
-});
-
-const subtitleCheck = document.getElementById("subtitle-checkbox");
-subtitleCheck.addEventListener("change", () => {
-    if (subtitleCheck.checked) {
-        isSubtitle = true;
-        subtitleText.attr("visibility", "visible");
-        yComp += 0.02*height;
-        compText.y(yComp);
-        yArr += 0.02*height;
-        arrText.y(yArr);
-        layoutRerender(0);
-    } else {
-        isSubtitle = false;
-        subtitleText.attr("visibility", "hidden");
-        yComp -= 0.02*height;
-        compText.y(yComp);
-        yArr -= 0.02*height;
-        arrText.y(yArr);
-        layoutRerender(0);
-    }
-});
-
-const compCheck = document.getElementById("composer-checkbox");
-compCheck.addEventListener("change", () => {
-    if (compCheck.checked) {
-        isComposer = true;
-        compText.y(yComp);
-        compText.attr("visibility", "visible");
-        yArr += 0.025*height;
-        arrText.y(yArr);
-        layoutRerender(0);
-    } else {
-        isComposer = false;
-        compText.attr("visibility", "hidden");
-        yArr -= 0.025*height;
-        arrText.y(yArr);
-        layoutRerender(0);
-    }
-});
-
-const arrCheck = document.getElementById("arranger-checkbox");
-arrCheck.addEventListener("change", () => {
-    if (arrCheck.checked) {
-        isArranger = true;
-        arrText.y(yArr);
-        arrText.attr("visibility", "visible");
-        layoutRerender(0);
-    } else {
-        isArranger = false;
-        arrText.attr("visibility", "hidden");
-        layoutRerender(0);
-    }
-});
-// #endregion
-
-// Zooming (doesn't really work but i don't think panzoom can go in increments...)
-document.getElementById("zoom-in").addEventListener("click", () => page.zoom(2));
-document.getElementById("zoom-out").addEventListener("click", () => page.zoom(1));
+// Zooming
+document.getElementById("zoom-in").addEventListener("click", () => canvas.zoom(canvas.zoom() * 1.2));
+document.getElementById("zoom-out").addEventListener("click", () => canvas.zoom(canvas.zoom() / 1.2));
 
 // Preview
-document.getElementById("preview-btn").addEventListener("click", showPreview);
+document.getElementById("preview-btn").addEventListener("click", () => {
+    alert("Preview functionality in progress.\nWhen complete, it will be a popup showing all individual pages of sheet music without drop zones occupying any space. The preview will ideally have proper spacing for different note durations and different spacing for each horizontal line of music so that all lines start and end at the same x values (properly lined up)");
+});
 
 // Saving
 document.getElementById("save-btn").addEventListener("click", () => {
@@ -361,5 +140,5 @@ document.getElementById("print-btn").addEventListener("click", () => {
     alert("Printing functionality currently in progress")
 });
 
-var svgData = page.svg();   // XML
+var svgData = canvas.svg();   // XML
 console.log(svgData);

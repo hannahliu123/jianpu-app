@@ -251,5 +251,9 @@ button:active {
     right: 5px;
 }
 
+#ui-layer {
+    pointer-events: none;
+}
+
 @media print {
 }
