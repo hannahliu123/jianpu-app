@@ -36,27 +36,27 @@ function getInsertionData(e) {
     const measure = State.scoreData.measures.find(m => m.id === measureId);
     const relativeX = svgPt.x - measure.x;  // relative x inside the measure
 
-    // find insertion index (where the drop zone should snap)
-    let insertX = 0;
-    let accumulatedX = 0;
-    let insertIndex = 0;
+    let insertX = 0;    // find insertion index (where the drop zone should snap)
+    let insertIndex = measure.items.length; // default to end
     for (let i = 0; i < measure.items.length; i++) {    // ⭐⭐ CHANGE HOVER DETECTION LATER 
         const item = measure.items[i];
-        const itemWidth = item.width;
-        // if mouse is past the halfway point of this note, move the line to the right of it
-        if (relativeX > accumulatedX + (itemWidth / 2)) {
-            insertX = accumulatedX + itemWidth + (CONFIG.itemSpacing / 2);
-            insertIndex = i+1;  // after current item
-        } accumulatedX += itemWidth + CONFIG.itemSpacing;
+
+        // once we get to the bar (end) or if mouse is infront of/at the current element
+        if (item.type === 'bar' || relativeX <= item.x) {
+            // Snap the drop zone to the left of this item
+            insertX = item.x - (item.width / 2) - (CONFIG.itemSpacing / 2);
+            insertIndex = i;
+            break; // Stop looking!
+        }
     }
 
-    // data for the measure, x pos relative to measure, index to insert in measure
+    // data for the measure, x pos relative to measure (center), index to insert in measure
     return { measure, insertX, insertIndex };   // this is an object!
 }
 
 canvas.on("mousemove", (e) => {   // show dropZone
     if (!State.selectedTool) {    // no selected tool
-    dropZone.hide();
+        dropZone.hide();
         return;
     }
     
@@ -105,7 +105,7 @@ document.querySelectorAll(".icon").forEach(icon => {
 
 // Adding Measures
 document.getElementById("add-measure-btn").addEventListener("click", () => {
-    // for (let i=0; i < 5; ++i) addMeasure();
+    for (let i=0; i < 150; ++i) addMeasure();
     addMeasure();
 });
 
@@ -140,5 +140,5 @@ document.getElementById("print-btn").addEventListener("click", () => {
     alert("Printing functionality currently in progress")
 });
 
-var svgData = canvas.svg();   // XML
-console.log(svgData);
+// var svgData = canvas.svg();   // XML
+// console.log(svgData);

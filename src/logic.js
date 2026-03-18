@@ -6,11 +6,15 @@ import { getStartY } from './state.js';
 
 // Add selectedTool to targetIndex of measure
 export function addItem(targetIndex, measure, selectedTool, scoreData) {
+    let prefix = "n-";
+    if (selectedTool === "bar") prefix = "b-";
+
     // create new data for the new item being inserted
     let newItem = ({
-        id: `n-${crypto.randomUUID().slice(0, 8)}`,
+        id: prefix + crypto.randomUUID().slice(0, 8),
         type: selectedTool,
-        width: CONFIG.itemData[selectedTool].width
+        width: CONFIG.itemData[selectedTool].width,
+        x: 0    // placeholder, updated in updateInternalMeasureWidth()
     });
 
     newItem.svg = createItem(newItem, measure.svgGroup);    // create the svg
@@ -36,6 +40,8 @@ export function addMeasureData(scoreData) {
 
 // Loop from changed note thru all measures until a line isn't pushed down (only moves MEASURES as groups, not the internal notes within them)
 export function layoutRerender(scoreData, start) {
+    console.log(scoreData, start);   // debugging
+
     let currX = CONFIG.defaultMeasureX;
     let currRow = 1;
     let currPage = 0;
@@ -51,6 +57,8 @@ export function layoutRerender(scoreData, start) {
         const measure = scoreData.measures[i];
 
         if (currX + measure.width > CONFIG.rowLength) {
+            console.log("wrap to next ROW at measure index " + i);  // debugging
+
             // wrap to next row
             currRow++;
             currX = CONFIG.defaultMeasureX;
@@ -58,6 +66,8 @@ export function layoutRerender(scoreData, start) {
 
         let currY = getStartY(currPage) + (currRow * CONFIG.rowSpace);
         if (currY + CONFIG.measureHeight > CONFIG.pageHeight - CONFIG.bottomMargin) {
+            console.log("wrap to next PAGE at measure index " + i);  // debugging
+
             // wrap to next page
             currPage++;
             currRow = 1;
@@ -80,8 +90,10 @@ function updateInternalMeasureWidth(measure) {
     let measureX = 0;   // x value relative to current measure
     measure.items.forEach(item => {
         item.x = measureX + item.width/2;  // update data
-        if (item.svg) item.svg.x(item.x);   // update svg (shhh we don't talk about why this isn't in renderer.js im too lazy)
-        measureX += item.width + CONFIG.itemSpacing;
+        if (item.svg) {
+            item.svg.cx(item.x);   // update svg (shhh we don't talk about why this isn't in renderer.js im too lazy)
+            item.svg.y(0);  // make sure y pos relative to measure doesn't change
+        } measureX += item.width + CONFIG.itemSpacing;
     });
     measure.width = measureX;
 }
