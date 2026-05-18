@@ -41,7 +41,9 @@ function getInsertionData(e) {
 
     let insertX = 0;    // find insertion index (where the drop zone should snap)
     let insertIndex = measure.items.length; // default to end
-    for (let i = 0; i < measure.items.length; i++) {    // ⭐⭐ CHANGE HOVER DETECTION LATER 
+    for (let i = 0; i < measure.items.length; i++) {    // loops through measure to find the exact x-coord
+        // ⭐⭐ you'll need y-values later
+        
         const item = measure.items[i];
 
         // once we get to the bar (end) or if mouse is infront of/at the current element
@@ -134,8 +136,8 @@ canvas.on("wheel", e => {
         let newY = vb.y;
         let newX = vb.x;
 
-        const totalHeight = musicLayer.bbox().height;   // height of all pages
-        const totalWidth = musicLayer.bbox().width;
+        const totalHeight = State.scoreData.layout.totalHeight;   // height of all pages
+        const totalWidth = State.scoreData.layout.totalWidth;
         const margin = CONFIG.autoMargin/currZoom;
         
         const minY = -margin;   // highest possible height
@@ -155,7 +157,6 @@ canvas.on("wheel", e => {
         }
 
         canvas.viewbox(newX, newY, vb.w, vb.h);
-        
     } else if (e.shiftKey) { // manual horizontal scrolling
         const vb = canvas.viewbox();
         const zoom = canvas.zoom();     // use zoom so that you don't scroll by a ton when zoomed into a small area
@@ -164,7 +165,7 @@ canvas.on("wheel", e => {
         let newX = vb.x + scrollAmount;
 
         // limit how far they can scroll horizontally
-        const totalWidth = musicLayer.bbox().width;   // width of pages
+        const totalWidth = State.scoreData.layout.totalWidth;   // width of pages
         const margin = CONFIG.autoMargin/zoom;
         const minX = -margin;
         let maxX = Math.max(minX, totalWidth + margin - vb.w);
@@ -175,7 +176,7 @@ canvas.on("wheel", e => {
             newX = maxX;
         }
 
-        canvas.viewbox(newX, vb.y, vb.w, vb.h);     // min x coord, min y coord, width, height
+        canvas.viewbox(newX, vb.y, vb.w, vb.h);
     } else {    // manual vertical scrolling
         const vb = canvas.viewbox();
         const zoom = canvas.zoom();     // use zoom so that you don't scroll by a ton when zoomed into a small area
@@ -185,7 +186,7 @@ canvas.on("wheel", e => {
         let newY = vb.y + scrollAmount;
 
         // limit how far they can scroll vertically
-        const totalHeight = musicLayer.bbox().height;   // height of all pages
+        const totalHeight = State.scoreData.layout.totalHeight;   // height of all pages
         const margin = CONFIG.autoMargin/zoom;
         const minY = -margin;   // highest possible height
         let maxY = Math.max(minY, totalHeight + margin - vb.h); // lowest possible height relative to the top of the viewbox
@@ -195,6 +196,7 @@ canvas.on("wheel", e => {
         } else if (newY > maxY) {
             newY = maxY;
         }
+
         canvas.viewbox(vb.x, newY, vb.w, vb.h);     // min x coord, min y coord, width, height
     }
 }, { passive: false });     // tells browser im preventing default behavior
@@ -206,8 +208,8 @@ canvas.on("panning", function(e) {
     let updated = false;    // checks if boundary has been broken (if we need to prevent the panning)
 
     const margin = CONFIG.autoMargin / zoom;
-    const totalHeight = musicLayer.bbox().height; // total height of all pages
-    const totalWidth = musicLayer.bbox().width;   // total width of your page setup
+    const totalHeight = State.scoreData.layout.totalHeight; // total height of all pages
+    const totalWidth = State.scoreData.layout.totalWidth;   // total width of your page setup
 
     const minY = -margin;
     let maxY = Math.max(minY, totalHeight + margin - vb.h);

@@ -2,6 +2,7 @@
 
 import { SVG } from '@svgdotjs/svg.js';
 import * as CONFIG from './constants.js';
+import { scoreData } from './state.js';
 
 // measureGroup is an svg reference to the measure group that we want to insert item into
 export function createItem(item, measureGroup) {    // create an svg for item
@@ -65,16 +66,13 @@ export function createPageGroup(pageIndex, container) {
         .fill("white")
         .stroke({ color: "#ccc", width: 0.25 })
         .back();
+    
+    scoreData.layout.totalPages++;  // update data
+    scoreData.layout.totalHeight = container.bbox().height;
 
-    // DON'T expand SVG canvas height (fixed). Only the vb changes when we scroll down
-    const newHeight = yOffset + CONFIG.pageHeight + CONFIG.pageSpace + CONFIG.autoMargin;
-    const vb = canvas.viewbox();
-    console.log("Previous VB: " + vb);
-    // canvas.viewbox(-CONFIG.autoMargin, -CONFIG.autoMargin, CONFIG.screenWidth, newHeight-CONFIG.pageSpace+CONFIG.autoMargin);
-    // console.log("New VB: " + canvas.viewbox());
-    // canvas.viewbox(-CONFIG.autoMargin, -CONFIG.autoMargin, CONFIG.screenWidth, newHeight);
+    // Note: we DON'T expand the SVG canvas size/height (fixed). Only the vb changes when we scroll down
 
-    // ⭐⭐ change later? set viewbox to the created page? 
+    // ⭐⭐ later, should we set the viewbox to the created page? (optional)
 
     return pageGroup;
 }

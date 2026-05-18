@@ -1,7 +1,7 @@
 // MAYBE LATER: capitalize variables that won't change
 
 export const container = document.getElementById("sheet-container");
-export const autoMargin = 25;   // initial (automatic) margin above and to the right of the starting page when you load up the app
+export const autoMargin = 50;   // initial (automatic) margin above and to the right of the starting page when you load up the app
 export const screenWidth = container.clientWidth;
 export const screenHeight = container.clientHeight;
 export const width = screenWidth - 2*autoMargin;    // width of paper

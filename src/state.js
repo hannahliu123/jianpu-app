@@ -11,6 +11,11 @@ export let scoreData = {
         key: null,
         tempo: null
     },
+    layout: {
+        totalWidth: width,
+        totalHeight: 0,
+        totalPages: 0
+    },
     measures: []    // will contain objects which represent each measure and will contain another array for notes
 };
 
