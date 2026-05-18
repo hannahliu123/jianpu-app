@@ -121,7 +121,6 @@ document.getElementById("zoom-out").addEventListener("click", () => canvas.zoom(
 canvas.on("wheel", e => {
     e.preventDefault();
 
-    let newY = 0;   // default initialize to 0 (we change it later)
     if (e.ctrlKey) {    // zoom
         const zFactor = 1+CONFIG.zoomFactor;
         let currZoom = canvas.zoom();
@@ -132,20 +131,52 @@ canvas.on("wheel", e => {
         // check if we zoomed past any boundaries
         let vb = canvas.viewbox();
         currZoom = canvas.zoom();  // update variables
-        newY = vb.y;
+        let newY = vb.y;
+        let newX = vb.x;
+
         const totalHeight = musicLayer.bbox().height;   // height of all pages
+        const totalWidth = musicLayer.bbox().width;
         const margin = CONFIG.autoMargin/currZoom;
+        
         const minY = -margin;   // highest possible height
         let maxY = Math.max(minY, totalHeight + margin - vb.h); // lowest possible height relative to the top of the viewbox
-        
         if (vb.h >= totalHeight + (margin * 2) || newY < minY) {   // zoomed out too far
             newY = minY;
         } else if (newY > maxY) {
             newY = maxY;
         }
-        canvas.viewbox(vb.x, newY, vb.w, vb.h);
+
+        const minX = -margin;
+        let maxX = Math.max(minX, totalWidth + margin - vb.w);
+        if (vb.w >= totalWidth + (margin * 2) || newX < minX) {
+            newX = minX;
+        } else if (newX > maxX) {
+            newX = maxX;
+        }
+
+        canvas.viewbox(newX, newY, vb.w, vb.h);
         
-    } else {    // manual scrolling
+    } else if (e.shiftKey) { // manual horizontal scrolling
+        const vb = canvas.viewbox();
+        const zoom = canvas.zoom();     // use zoom so that you don't scroll by a ton when zoomed into a small area
+
+        const scrollAmount = e.deltaY / zoom;
+        let newX = vb.x + scrollAmount;
+
+        // limit how far they can scroll horizontally
+        const totalWidth = musicLayer.bbox().width;   // width of pages
+        const margin = CONFIG.autoMargin/zoom;
+        const minX = -margin;
+        let maxX = Math.max(minX, totalWidth + margin - vb.w);
+        
+        if (newX < minX) {
+            newX = minX;
+        } else if (newX > maxX) {
+            newX = maxX;
+        }
+
+        canvas.viewbox(newX, vb.y, vb.w, vb.h);     // min x coord, min y coord, width, height
+    } else {    // manual vertical scrolling
         const vb = canvas.viewbox();
         const zoom = canvas.zoom();     // use zoom so that you don't scroll by a ton when zoomed into a small area
 
@@ -167,6 +198,44 @@ canvas.on("wheel", e => {
         canvas.viewbox(vb.x, newY, vb.w, vb.h);     // min x coord, min y coord, width, height
     }
 }, { passive: false });     // tells browser im preventing default behavior
+
+// Panning
+canvas.on("panning", function(e) {
+    let vb = e.detail.box;  // contains info of what panZoom wants to change
+    const zoom = canvas.zoom();
+    let updated = false;    // checks if boundary has been broken (if we need to prevent the panning)
+
+    const margin = CONFIG.autoMargin / zoom;
+    const totalHeight = musicLayer.bbox().height; // total height of all pages
+    const totalWidth = musicLayer.bbox().width;   // total width of your page setup
+
+    const minY = -margin;
+    let maxY = Math.max(minY, totalHeight + margin - vb.h);
+    let newY = vb.y;
+    if (vb.h >= totalHeight + (margin * 2) || newY < minY) {
+        newY = minY;
+        updated = true;
+    } else if (newY > maxY) {
+        newY = maxY;
+        updated = true;
+    }
+
+    const minX = -margin;
+    let maxX = Math.max(minX, totalWidth + margin - vb.w);
+    let newX = vb.x;
+    if (vb.w >= totalWidth + (margin * 2) || newX < minX) {
+        newX = minX;
+        updated = true;
+    } else if (newX > maxX) {
+        newX = maxX;
+        updated = true;
+    }
+
+    if (updated) {
+        e.preventDefault();
+        canvas.viewbox(newX, newY, vb.w, vb.h);
+    }
+})
 
 // Preview
 document.getElementById("preview-btn").addEventListener("click", () => {
