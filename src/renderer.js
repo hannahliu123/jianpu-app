@@ -59,17 +59,20 @@ export function createPageGroup(pageIndex, container) {
 
     const pageGroup = container.group()
         .id(`page-${pageIndex}`)
-        .translate(0, yOffset); // move is unreliabel for groups!
+        .translate(0, yOffset); // move is unreliable for groups!
     
     pageGroup.rect(CONFIG.width, CONFIG.pageHeight)
         .fill("white")
         .stroke({ color: "#ccc", width: 0.25 })
         .back();
 
-    // expand SVG canvas height (fixed) so we can scroll to the new page
-    const newHeight = yOffset + CONFIG.pageHeight + CONFIG.pageSpace;
-    canvas.size(CONFIG.screenWidth, newHeight);     // canvas svg
-    canvas.viewbox(-CONFIG.autoMargin, -CONFIG.autoMargin, CONFIG.screenWidth, newHeight);
+    // DON'T expand SVG canvas height (fixed). Only the vb changes when we scroll down
+    const newHeight = yOffset + CONFIG.pageHeight + CONFIG.pageSpace + CONFIG.autoMargin;
+    const vb = canvas.viewbox();
+    console.log("Previous VB: " + vb);
+    // canvas.viewbox(-CONFIG.autoMargin, -CONFIG.autoMargin, CONFIG.screenWidth, newHeight-CONFIG.pageSpace+CONFIG.autoMargin);
+    // console.log("New VB: " + canvas.viewbox());
+    // canvas.viewbox(-CONFIG.autoMargin, -CONFIG.autoMargin, CONFIG.screenWidth, newHeight);
 
     // ⭐⭐ change later? set viewbox to the created page? 
 

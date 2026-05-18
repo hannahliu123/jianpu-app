@@ -10,6 +10,10 @@ export const bottomMargin = 0.075*pageHeight;   // margin at bottom of page
 export const pageSpace = 0.02*pageHeight;       // space between pages
 export let noteSize = 0.03*width;
 
+export const zoomFactor = 0.2;  // how much to zoom in/out
+export const zoomMin = 0.75;
+export const zoomMax = 5;
+
 // Setup
 export let titleSize = 0.05*width;
 export let titleY = 0.1*pageHeight;

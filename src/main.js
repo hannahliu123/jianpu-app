@@ -11,7 +11,10 @@ import { createMeasure, createPageGroup } from './renderer.js';
 const canvas = SVG().addTo(CONFIG.container)
     .size(CONFIG.screenWidth, CONFIG.screenHeight)
     .viewbox(-CONFIG.autoMargin, -CONFIG.autoMargin, CONFIG.screenWidth, CONFIG.screenHeight);
-canvas.panZoom({ zoomMin: 0.25, zoomMax: 5, zoomFactor: 0.1 });
+canvas.panZoom({
+    wheelZoom: false,   // custom logic instead
+    panning: true
+});
 
 setupEditorUI();    // Initialize UI
 const musicLayer = canvas.group().id("music-layer");
@@ -105,13 +108,65 @@ document.querySelectorAll(".icon").forEach(icon => {
 
 // Adding Measures
 document.getElementById("add-measure-btn").addEventListener("click", () => {
-    for (let i=0; i < 150; ++i) addMeasure();
+    for (let i=0; i < 400; ++i) addMeasure();
     addMeasure();
 });
 
 // Zooming
-document.getElementById("zoom-in").addEventListener("click", () => canvas.zoom(canvas.zoom() * 1.2));
-document.getElementById("zoom-out").addEventListener("click", () => canvas.zoom(canvas.zoom() / 1.2));
+function getZoom(zoom) {    // keep zoom within boundaries
+    return Math.min(Math.max(zoom, CONFIG.zoomMin), CONFIG.zoomMax);
+}
+document.getElementById("zoom-in").addEventListener("click", () => canvas.zoom(getZoom(canvas.zoom() * (1+CONFIG.zoomFactor))));
+document.getElementById("zoom-out").addEventListener("click", () => canvas.zoom(getZoom(canvas.zoom() / (1+CONFIG.zoomFactor))));
+canvas.on("wheel", e => {
+    e.preventDefault();
+
+    let newY = 0;   // default initialize to 0 (we change it later)
+    if (e.ctrlKey) {    // zoom
+        const zFactor = 1+CONFIG.zoomFactor;
+        let currZoom = canvas.zoom();
+        const newZoom = e.deltaY < 0? currZoom*zFactor : currZoom/zFactor;
+        const point = canvas.point(e.clientX, e.clientY);   // centers zoom around mouse
+        canvas.zoom(getZoom(newZoom), point);
+
+        // check if we zoomed past any boundaries
+        let vb = canvas.viewbox();
+        currZoom = canvas.zoom();  // update variables
+        newY = vb.y;
+        const totalHeight = musicLayer.bbox().height;   // height of all pages
+        const margin = CONFIG.autoMargin/currZoom;
+        const minY = -margin;   // highest possible height
+        let maxY = Math.max(minY, totalHeight + margin - vb.h); // lowest possible height relative to the top of the viewbox
+        
+        if (vb.h >= totalHeight + (margin * 2) || newY < minY) {   // zoomed out too far
+            newY = minY;
+        } else if (newY > maxY) {
+            newY = maxY;
+        }
+        canvas.viewbox(vb.x, newY, vb.w, vb.h);
+        
+    } else {    // manual scrolling
+        const vb = canvas.viewbox();
+        const zoom = canvas.zoom();     // use zoom so that you don't scroll by a ton when zoomed into a small area
+
+        // deltaY pos=down, negative=up
+        const scrollAmount = e.deltaY / zoom;
+        let newY = vb.y + scrollAmount;
+
+        // limit how far they can scroll vertically
+        const totalHeight = musicLayer.bbox().height;   // height of all pages
+        const margin = CONFIG.autoMargin/zoom;
+        const minY = -margin;   // highest possible height
+        let maxY = Math.max(minY, totalHeight + margin - vb.h); // lowest possible height relative to the top of the viewbox
+        
+        if (newY < minY) {
+            newY = minY;
+        } else if (newY > maxY) {
+            newY = maxY;
+        }
+        canvas.viewbox(vb.x, newY, vb.w, vb.h);     // min x coord, min y coord, width, height
+    }
+}, { passive: false });     // tells browser im preventing default behavior
 
 // Preview
 document.getElementById("preview-btn").addEventListener("click", () => {
