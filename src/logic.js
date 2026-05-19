@@ -6,6 +6,8 @@ import { getStartY } from './state.js';
 
 // Add selectedTool to targetIndex of measure
 export function addItem(targetIndex, measure, selectedTool, scoreData) {
+    // ⭐⭐ Add functionality for parent groupings
+
     let prefix = "n-";
     if (selectedTool === "bar") prefix = "b-";
 
@@ -40,8 +42,6 @@ export function addMeasureData(scoreData) {
 
 // Loop from changed note thru all measures until a line isn't pushed down (only moves MEASURES as groups, not the internal notes within them)
 export function layoutRerender(scoreData, start) {
-    console.log(scoreData, start);   // debugging
-
     let currX = CONFIG.defaultMeasureX;
     let currRow = 1;
     let currPage = 0;
@@ -57,8 +57,6 @@ export function layoutRerender(scoreData, start) {
         const measure = scoreData.measures[i];
 
         if (currX + measure.width > CONFIG.rowLength) {
-            console.log("wrap to next ROW at measure index " + i);  // debugging
-
             // wrap to next row
             currRow++;
             currX = CONFIG.defaultMeasureX;
@@ -66,12 +64,15 @@ export function layoutRerender(scoreData, start) {
 
         let currY = getStartY(currPage) + (currRow * CONFIG.rowSpace);
         if (currY + CONFIG.measureHeight > CONFIG.pageHeight - CONFIG.bottomMargin) {
-            console.log("wrap to next PAGE at measure index " + i);  // debugging
-
             // wrap to next page
             currPage++;
             currRow = 1;
             currY = getStartY(currPage) + CONFIG.rowSpace;
+        }
+
+        // check if there's even a change; if no change break
+        if (i > start && measure.x === currX && measure.y === currY) {
+            break;
         }
 
         measure.x = currX;
@@ -81,8 +82,6 @@ export function layoutRerender(scoreData, start) {
         
         renderMeasure(measure);
         currX += measure.width + CONFIG.measureSpacing;
-
-        // ⭐⭐ check if oldpos === newpos, if so break
     }
 }
 

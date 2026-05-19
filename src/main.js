@@ -67,7 +67,7 @@ canvas.on("mousemove", (e) => {   // show dropZone
     
     const data = getInsertionData(e);
     if (data) {
-        const yOffset = data.measure.pageIndex * (CONFIG.pageHeight + CONFIG.pageSpace);
+        const yOffset = data.measure.pageIndex * (CONFIG.pageHeight + CONFIG.pageSpace);    // y-value of the top of the page
         dropZone.move(data.measure.x + data.insertX, data.measure.y + yOffset).show();
     } else dropZone.hide();
 });
@@ -118,8 +118,8 @@ document.getElementById("add-measure-btn").addEventListener("click", () => {
 function getZoom(zoom) {    // keep zoom within boundaries
     return Math.min(Math.max(zoom, CONFIG.zoomMin), CONFIG.zoomMax);
 }
-document.getElementById("zoom-in").addEventListener("click", () => canvas.zoom(getZoom(canvas.zoom() * (1+CONFIG.zoomFactor))));
-document.getElementById("zoom-out").addEventListener("click", () => canvas.zoom(getZoom(canvas.zoom() / (1+CONFIG.zoomFactor))));
+document.getElementById("zoom-in").addEventListener("click", () => canvas.zoom(getZoom(canvas.zoom() * (1+CONFIG.smallZoomFactor))));
+document.getElementById("zoom-out").addEventListener("click", () => canvas.zoom(getZoom(canvas.zoom() / (1+CONFIG.smallZoomFactor))));
 canvas.on("wheel", e => {
     e.preventDefault();
 

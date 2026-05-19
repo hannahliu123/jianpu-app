@@ -55,9 +55,6 @@ export function createPageGroup(pageIndex, container) {
     const yOffset = pageIndex * (CONFIG.pageHeight + CONFIG.pageSpace);
     const canvas = container.parent();
 
-    console.log("NEW PAGE at index '" + pageIndex + "' with y offset: " + yOffset + " in container " + container);   // debugging
-    console.log(container);
-
     const pageGroup = container.group()
         .id(`page-${pageIndex}`)
         .translate(0, yOffset); // move is unreliable for groups!
@@ -71,8 +68,6 @@ export function createPageGroup(pageIndex, container) {
     scoreData.layout.totalHeight = container.bbox().height;
 
     // Note: we DON'T expand the SVG canvas size/height (fixed). Only the vb changes when we scroll down
-
-    // ⭐⭐ later, should we set the viewbox to the created page? (optional)
 
     return pageGroup;
 }

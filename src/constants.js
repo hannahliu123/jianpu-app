@@ -11,6 +11,7 @@ export const pageSpace = 0.02*pageHeight;       // space between pages
 export let noteSize = 0.03*width;
 
 export const zoomFactor = 0.2;  // how much to zoom in/out
+export const smallZoomFactor = 0.05;    // used for buttons
 export const zoomMin = 0.75;
 export const zoomMax = 5;
 
@@ -35,8 +36,10 @@ export let rowSpace = 0.1*width;       // space inbetween rows (let users edit l
 export let dropZoneWidth = 0.01*width;
 export let dropLineWidth = 0.0025*width;
 
+// we use icon in renderer.js
 export const itemData = {   // not currently using the width for anything
     "bar": { width: barSpace }, // lowkey uselessssssss
+    "note0": {width: noteSize, icon: "0"},
     "note1": {width: noteSize, icon: "1"},
     "note2": {width: noteSize, icon: "2"},
     "note3": {width: noteSize, icon: "3"},
