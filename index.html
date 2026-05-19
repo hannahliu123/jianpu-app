@@ -19,7 +19,7 @@
     </header>
     <main id="main-layout">
         <div id="pin-bar">
-            <p>xxx (pin bar)</p>
+            <p>xxx (pin bar wip)</p>
         </div>
         <div id="main-section">
             <div id="sidebar">
@@ -34,6 +34,14 @@
                 <div class="section" data-target="notes-icons">
                     <!-- some icon -->
                     <p>Notes</p>
+                </div>
+                <div class="section" data-target="bars-icons">
+                    <!-- some icon -->
+                    <p>Bars</p>
+                </div>
+                <div class="section" data-target="duration-pitch-icons">
+                    <!-- some icon -->
+                    <p>Duration & Pitch</p>
                 </div>
                 <div class="section" data-target="articulations-icons">
                     <!-- some icon -->
@@ -81,8 +89,8 @@
                     </div>
                 </div>
                 <div id="notes-icons">
-                    <h4 id="notes-header" class="edit-panel-headers">Notes/Symbols</h4>
-                    <div id="notes-container">
+                    <h4 id="notes-header" class="edit-panel-headers">Notes</h4>
+                    <div class="tools-container">
                         <div class="icon" data-type="note0">
                             <svg width="20" height="20">
                                 <text font-family="Arial" x="10" y="10" font-size="1rem" text-anchor="middle" dominant-baseline="middle">0</text>   <!--  x & y set the BASEline for svg elements. text-anchor and dominant-basline center the text in the middle of the svg -->
@@ -125,6 +133,53 @@
                         </div>
                     </div>
                     <button id="add-measure-btn">Add Measure</button>
+                </div>
+                <div id="bars-icons">
+                    <h4 id="bars-header" class="edit-panel-headers">Bars</h4>
+                    <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit.</p>
+                </div>
+                <div id="duration-pitch-icons">
+                    <h4 id="duration-pitch-header" class="edit-panel-headers">Duration & Pitch</h4>
+                    <div class="tools-container">
+                        <div class="icon" data-type="dot1">
+                            <svg width="20" height="20">
+                                <circle cx="10" cy="10" r="1" fill="black" />
+                            </svg>
+                        </div>
+                        <div class="icon" data-type="dot2">
+                            <svg width="20" height="20">
+                                <circle cx="10" cy="7" r="1" fill="black" />
+                                <circle cx="10" cy="12" r="1" fill="black" />
+                            </svg>
+                        </div>
+                        <div class="icon" data-type="dot3">
+                            <svg width="20" height="20">
+                                <circle cx="10" cy="5" r="1" fill="black" />
+                                <circle cx="10" cy="9" r="1" fill="black" />
+                                <circle cx="10" cy="13" r="1" fill="black" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="tools-container">
+                        <div class="icon" data-type="sharp">
+                            <svg width="20" height="20">
+                                <line x1="6" y1="4" x2="6" y2="16" stroke="black" stroke-width="1"/>
+                                <line x1="14" y1="4" x2="14" y2="16" stroke="black" stroke-width="1"/>
+                                <line x1="4" y1="7" x2="16" y2="7" stroke="black" stroke-width="1"/>
+                                <line x1="4" y1="13" x2="16" y2="13" stroke="black" stroke-width="1"/>
+                            </svg>
+                        </div>
+                        <div class="icon" data-type="flat">
+                            <svg width="20" height="20">
+                                ;
+                            </svg>
+                        </div>
+                        <div class="icon" data-type="natural">
+                            <svg width="20" height="20">
+                                ;
+                            </svg>
+                        </div>
+                    </div>
                 </div>
                 <div id="articulations-icons">
                     <h4 id="articulations-header" class="edit-panel-headers">Articulations</h4>

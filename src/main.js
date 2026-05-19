@@ -138,7 +138,7 @@ canvas.on("wheel", e => {
 
         const totalHeight = State.scoreData.layout.totalHeight;   // height of all pages
         const totalWidth = State.scoreData.layout.totalWidth;
-        const margin = CONFIG.autoMargin/currZoom;
+        let margin = CONFIG.autoMargin/currZoom;
         
         const minY = -margin;   // highest possible height
         let maxY = Math.max(minY, totalHeight + margin - vb.h); // lowest possible height relative to the top of the viewbox
@@ -148,6 +148,7 @@ canvas.on("wheel", e => {
             newY = maxY;
         }
 
+        margin = 0.3*CONFIG.width / currZoom;   // more margin for horizontal scrolling (for bigger screens)
         const minX = -margin;
         let maxX = Math.max(minX, totalWidth + margin - vb.w);
         if (vb.w >= totalWidth + (margin * 2) || newX < minX) {
@@ -161,12 +162,12 @@ canvas.on("wheel", e => {
         const vb = canvas.viewbox();
         const zoom = canvas.zoom();     // use zoom so that you don't scroll by a ton when zoomed into a small area
 
-        const scrollAmount = e.deltaY / zoom;
+        const scrollAmount = 0.25*e.deltaY / zoom;
         let newX = vb.x + scrollAmount;
 
         // limit how far they can scroll horizontally
         const totalWidth = State.scoreData.layout.totalWidth;   // width of pages
-        const margin = CONFIG.autoMargin/zoom;
+        const margin = 0.3*CONFIG.width / zoom;
         const minX = -margin;
         let maxX = Math.max(minX, totalWidth + margin - vb.w);
         
@@ -182,7 +183,7 @@ canvas.on("wheel", e => {
         const zoom = canvas.zoom();     // use zoom so that you don't scroll by a ton when zoomed into a small area
 
         // deltaY pos=down, negative=up
-        const scrollAmount = e.deltaY / zoom;
+        const scrollAmount = 0.25*e.deltaY / zoom;
         let newY = vb.y + scrollAmount;
 
         // limit how far they can scroll vertically
@@ -207,7 +208,7 @@ canvas.on("panning", function(e) {
     const zoom = canvas.zoom();
     let updated = false;    // checks if boundary has been broken (if we need to prevent the panning)
 
-    const margin = CONFIG.autoMargin / zoom;
+    let margin = CONFIG.autoMargin / zoom;
     const totalHeight = State.scoreData.layout.totalHeight; // total height of all pages
     const totalWidth = State.scoreData.layout.totalWidth;   // total width of your page setup
 
@@ -222,6 +223,7 @@ canvas.on("panning", function(e) {
         updated = true;
     }
 
+    margin = 0.3*CONFIG.width / zoom;
     const minX = -margin;
     let maxX = Math.max(minX, totalWidth + margin - vb.w);
     let newX = vb.x;
