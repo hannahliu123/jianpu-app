@@ -47,5 +47,5 @@ export const itemData = {   // not currently using the width for anything
     "note5": {width: noteSize, icon: "5"},
     "note6": {width: noteSize, icon: "6"},
     "note7": {width: noteSize, icon: "7"},
-    "rest": {width: noteSize, icon: "-"},
+    "dash": {width: noteSize, icon: "-"},
 }
